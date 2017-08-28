@@ -1,0 +1,4 @@
+<apex:page standardController="Inventory_Location__c" recordSetVar="Inventory_Locations" 
+extensions="TSS_StickIt_MR1.stickItListViewControllerv2" showHeader="false" standardStylesheets="false">
+    <TSS_StickIt_MR1:StickIt_Dual selectedRecords="{!records}" />
+</apex:page>

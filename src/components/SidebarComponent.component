@@ -1,0 +1,83 @@
+<apex:component >
+<apex:attribute name="currentComponent" type="String" required="false" description="current component"></apex:attribute>
+	<style>
+		.app-sidebar{
+    	background:#6f7982
+    }
+    .navigation-menus li {
+    display: block;
+    padding: 2px 0px 2px 1px;
+    border: 0px solid;
+    background: #6f7982;
+    border-bottom: 2px solid white;
+}
+.app-sidebar .navigation-menus li > a:hover {
+    background-color: white;
+    color:#6f7982;
+}
+.navigation-menus li:hover {
+     background-color: white;
+}
+.app-sidebar li:not(.active):hover a {
+    color: #6f7982;
+    background-color: #e8e2e2;
+}
+	</style>
+	<script>
+		function toggleSideBar(){
+			if($(".app-sidebar").css('display') != 'none'){
+				$("#menuBttn").css("margin-left", "8px");
+				//$(".app-sidebar").toggle('slide', {"direction":"left"}, 200);
+				$("#applicationContainer").css('float', 'none');
+				$("#applicationContainer").removeAttr("style");
+				$("#applicationContainer").css({"padding-top":"30px","padding-bottom":"30px"});
+			}
+			else{
+				$("#menuBttn").css("margin-left", "182px");
+				$(".app-sidebar").toggle('slide', {"direction":"left"}, 200);
+				$("#applicationContainer").css({'float':'right','transition':'float 1s'});
+				$("#applicationContainer").css('width', 'calc(100% - 170px)');
+			}
+		}
+		function closeSideBar(){
+			if($(".app-sidebar").css('display') != 'none'){
+			$("#menuBttn").css("margin-left", "8px");
+			$(".app-sidebar").toggle('slide', {"direction":"left"}, 200);
+			$("#applicationContainer").css('float', 'none');
+			$("#applicationContainer").removeAttr("style");
+			$("#applicationContainer").css({"padding-top":"30px","padding-bottom":"30px"});
+			}
+		}
+		$(document).ready(function(){
+			$('.navigation-menus li').click(function(){
+				closeSideBar();
+			})
+		})
+        function logout(){
+        	sessionStorage.removeItem('messageFlag');
+            location.assign('/DistributionPartner/secur/logout.jsp');
+        }
+	</script>
+	<div class="app-sidebar" style="padding: 5px 0px 0px 5px;position:fixed;top:0;bottom:0">
+		<!--<div class="logo">
+		 	<apex:image value="{!URLFOR($Resource.application_css,'/images/logo.png')}" />
+			<span class="logo-text">Providing the essentials for childhood.</span>
+		</div>-->
+		<div class="navigation-menus">
+			<ul>
+				<li style="{!if(currentComponent!='CmmntyUsrPrflCmp','background-color:white','')}">
+					<a style="{!if(currentComponent!='CmmntyUsrPrflCmp','color:#6f7982','')}" href="{!$Site.CurrentSiteUrl}CommunityDashboard">
+               			<span class="fa fa-shopping-cart icon "></span>&nbsp;<span> My Orders</span>
+          		 		</a>
+          		 	</li>
+				
+				<li style="{!if(currentComponent=='CmmntyUsrPrflCmp','background-color:white','')}">
+					<a style="{!if(currentComponent=='CmmntyUsrPrflCmp','color:#6f7982','')}" href="{!$Site.CurrentSiteUrl}Profile">
+		                <span class="fa fa-user icon"></span>&nbsp;<span> My Profile</span>
+            		</a>
+				</li>
+				<li><a onclick="logout()" style="cursor:pointer"><span class="fa fa-power-off icon"></span>&nbsp;<span> Logout</span></a></li>
+			</ul>
+		</div>
+	</div>
+</apex:component>

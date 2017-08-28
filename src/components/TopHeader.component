@@ -1,0 +1,45 @@
+<apex:component controller="GlobalController">
+    <apex:attribute name="userName" type="String" required="true" description="User Name" ></apex:attribute>
+    <style>
+        .modal-content {
+        border-radius: 6px;
+        -webkit-box-shadow: 0 0 0;
+        box-shadow: 0 0 0;
+        border-color:white
+        }    
+    </style>
+    <script>
+    $(document).ready(function(){
+        if(sessionStorage.getItem('messageFlag')==undefined){
+            $('#myModal').modal();
+            sessionStorage.setItem('messageFlag',true);
+        }
+        $('body').css('font-family','sans-serif');
+    }); 
+    </script>
+    
+    <apex:outputPanel styleClass="app-header" id="sideBarCmp" layout="block" style="text-align: center;">
+        <span class="menuBttnCntnr" style="float:left">
+            <span id="menuBttn" onclick="toggleSideBar();" class="fa fa-bars fa-lg" aria-hidden="true"></span>
+        </span>	
+        <img src="/DistributionPartner/resource/1472462031000/application_img/logo.png" style="margin-top: 5px; width: 115px"/>
+        <!--<p class="userInfoHeader"><span class="fa fa-user" aria-hidden="true"></span> &nbsp;{!userName}</p> -->
+        <i class="fa fa-bell" style="float:right;margin-top:20px;margin-right:20px;cursor:pointer" data-toggle="modal" data-target="#myModal" onclick="setTimeout(function(){$('myModal').css('padding-right','0px')},100)"></i>
+        <apex:commandLink action="{!redirectToDashboard}" immediate="true" styleClass="fa fa-home fa-lg" style="text-decoration:none;color:#ffffff;float:right;margin-top:20px;margin-right:20px;cursor:pointer;" />
+    </apex:outputPanel>
+    <div class="modal fade" id="myModal" role="dialog" data-keyboard="false" data-backdrop="static" style="text-align:center;padding:0px !important">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="text-align: left;">
+                <div class="modal-header" style="background-color: #612d9c;color: white;">
+                    <h4 class="modal-title">Messages and Alerts</h4>
+                </div>
+                <div class="modal-body">
+                    <p><apex:outputText value="{!portal.Message__c}" escape="false"/></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-block" data-dismiss="modal">Ok, Got it!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</apex:component>

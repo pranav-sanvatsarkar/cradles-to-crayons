@@ -1,0 +1,93 @@
+<apex:page >
+<script type="text/javascript">
+    var screenStepsLivePage = 'https://screenstepslive.na8.visual.force.com/apex/ScreenStepsLive_Home';
+    /*e.g. https://screenstepslive.na3.visual.force.com/apex/ScreenStepsLive_Home*/
+</script>
+<div id="ScreenStepsLiveHC">
+<div id="ScreenStepsLiveHCLessons"></div>
+<p id="ScreenStepsLiveHCShowAllContainer" style="display: none;"><a href="#" id="ScreenStepsLiveHCShowAllLessons">View More</a></p>
+<h2 id="ScreenStepsLiveHCSearch">Search Tutorials</h2>
+<div id="ScreenStepsLiveHCSearchBox">
+<form name="srch_solution_sbar" id="ScreenStepsLiveHCSearch-form">
+<input type="text" style="margin:5px 5px 5px 0;width:150px;" name="ScreenStepsLiveHCSearch-field" id="ScreenStepsLiveHCSearch-field"></input><br /><input type="submit" value="Search" id="submit"></input></form>
+</div>
+<div id="ScreenStepsLiveHCSearchResults"></div>
+</div>
+<script type="text/javascript">
+    function initScreenSteps() {
+        jQuery(document).ready(function ($) {
+            jQuery.getJSON(screenStepsLivePage + '?url-pathname=' + encodeURI(window.location.pathname) + '&url-search=' + encodeURI(window.location.search) + '&callback=?');
+
+            jQuery('#ScreenStepsLiveHCSearch-form').submit(function (e) {
+                e.preventDefault();
+                var search_string = jQuery('#ScreenStepsLiveHCSearch-form input#ScreenStepsLiveHCSearch-field').val();
+                jQuery.getJSON(screenStepsLivePage + '?search=' + encodeURI(search_string) + '&callback=?');
+            });
+
+            jQuery('#ScreenStepsLiveHCShowAllLessons').click(function (e) {
+                e.preventDefault();
+                jQuery('#ScreenStepsLiveHCLessons .sslive-hidden').show('fast');
+                jQuery(this).hide();
+            });
+        });
+    }
+
+    function ieLoadBugFix(scriptElement) {
+        if ((scriptElement.readyState=='loaded' || scriptElement.readyState=='completed') && jQuery != 'undefined') {
+            initScreenSteps();
+        } else {
+            setTimeout(function () {
+                ieLoadBugFix(scriptElement);
+            }, 100);
+        }
+    }
+
+    function ScreenStepsLiveHomeComponentCallback(data) {
+        if (data === null) {
+            alert('Unable to load ScreenSteps Live content.');
+        }
+
+        if (data.type == 'search') {
+            if (data.htmlcontent === '') {
+                data.htmlcontent = '<p><b>No tutorials found</b></p>';
+            }
+            jQuery('#ScreenStepsLiveHCSearchResults').html(data.htmlcontent);
+        } else {
+            jQuery('#ScreenStepsLiveHCLessons').html(data.htmlcontent);
+        }
+
+        jQuery('#ScreenStepsLiveHC ul li').css('margin-left', '0').css('margin-bottom', '7px');
+        jQuery('#ScreenStepsLiveHC ul').css('padding-left', '20px').css('margin-left', '0').css('list-style', 'disc');
+        jQuery('#ScreenStepsLiveHCLessons ul').css('padding-left', '20px').css('margin-top', '0').css('list-style', 'disc');
+
+        var sidebarContainer = jQuery('div#sidebarDiv');
+        var sidebarInner = jQuery('div#sidebarDiv div.sidebarInner');
+        sidebarContainer.css('height', sidebarInner.height());
+
+        if (jQuery('#ScreenStepsLiveHCLessons .sslive-hidden').length > 0) {
+            jQuery('#ScreenStepsLiveHCShowAllContainer').show();
+        }
+    }
+
+    if (typeof jQuery == 'undefined') {
+        var headTag = document.getElementsByTagName("head")[0];
+        var jqTag = document.createElement('script');
+        jqTag.type = 'text/javascript';
+        jqTag.src = 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js';
+        jqTag.onload = function () {
+            jQuery.noConflict();
+            initScreenSteps();
+        };
+
+        ieLoadBugFix(jqTag);
+
+        headTag.appendChild(jqTag);
+    } else {
+        initScreenSteps();
+    }
+
+</script>
+
+
+
+</apex:page>

@@ -1,0 +1,55 @@
+<apex:page controller="DropOffMobileController" showHeader="false" standardStyleSheets="false">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>CradlesToCrayons</title>
+
+        <script src="{!URLFOR( $Resource.SenchaTouchSDK, 'sencha-touch-all.js')}"></script>
+        <link rel="stylesheet" href="{!URLFOR( $Resource.SenchaTouchSDK, 'resources/css/sencha-touch.css')}"></link>
+        
+        <script type="text/javascript">
+            var paramsString = window.location.search.substr(1),
+            paramsArray = paramsString.split("&"),
+                    
+            params = {},
+            testPlatform, i;
+        
+            for (i = 0; i < paramsArray.length; i++) {
+                var tmpArray = paramsArray[i].split("=");
+                params[tmpArray[0]] = tmpArray[1];
+            }
+            
+            window.touchSDKPath = '{!$Resource.SenchaTouchSDK}/';
+            if( params.local == "true") {
+                window.appUrl = 'http://localhost/CTC/';
+            }
+            else {
+                window.appUrl = '{!$Resource.CTCSenchaAppResource}/';
+            }
+        
+        
+            // Useful for making the "arguments" object a true array and also for creating a
+            // copy of an existing array.
+            function toArray(obj) {
+                return Array.prototype.slice.call(obj);
+            };
+            
+            // Bind in its simplest form
+            function bind(scope, fn) {
+                return function () {
+                    return fn.apply(scope, toArray(arguments));
+                };
+            };
+
+            Ext.Loader.setConfig({
+                enabled: true,
+                paths: {
+                    'CradlesToCrayons': appUrl + 'app'
+                }
+            });
+            
+            document.write('<' + 'script src="' + window.appUrl + 'app.js"></' + 'script>');     
+            document.write('<' + 'script src="' + window.appUrl + 'development.js"></' + 'script>');
+        </script>
+    </head>
+    <body></body>
+</apex:page>

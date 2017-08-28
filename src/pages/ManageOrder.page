@@ -1,0 +1,297 @@
+<apex:page sidebar="false" controller="ManageOrderController" showHeader="false"  tabStyle="Account"  action="{!Redirect}" >
+    <apex:stylesheet value="{!URLFOR($Resource.jquery, '/jquery/Style/css/smoothness/jquery-ui-1.9.0.custom.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.jquery,'/jquery/Script/jquery-1.8.2.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.jquery,'/jquery/Script/jquery-ui-1.9.0.custom.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.DataTable, '/DataTables-1.9.4/media/js/jquery.dataTables.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.vendor_js, 'jquery/jquery-ui.js')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.jquery, '/jquery/Style/css/PartnerOrder.css')}"/>
+    <script type="text/javascript">
+        var flag = 'True';
+        $(document).ready(function(){ 
+           $('table[id$=tblPartnerOrders]').dataTable( {
+             "bPaginate": false,
+             "bLengthChange": false,
+             "bFilter": false,
+             "bSort": true,
+             "bInfo": false,
+             "bAutoWidth": false
+        } ); 
+         $("#divTabs").tabs() ;
+          
+         $("#divpagination").buttonset();
+         $('.bPageBlock ').css('border-top','1px solid white');   
+        
+         tablecss();  
+            $("#divMiddle").click(function(){
+            $("#left").hide('drop',100);
+            $("#divMiddle").hide('drop',100);
+            $("#right").css('width','100%');
+            $("#side").css('opacity','1');
+         }).mouseover(function(){
+             $("#divMiddle").css("background-color","#D2E9FF"); 
+         }).mouseout(function(){
+             $("#divMiddle").css("background-color","white");  
+             
+         });
+         
+         $("#side").click(function(){
+            $("#left").show('drop',100);
+            $("#divMiddle").show('drop',100);
+            $("#right").css('width','83%');
+            $("#side").css('opacity','0');
+             
+         });
+           $('img[id$=btnhome1]').hide();
+         $('img[id$=btnhome2]').mouseover(function(){
+         $('img[id$=btnhome2]').hide();$('img[id$=btnhome1]').show(); 
+         });
+          $('img[id$=btnhome1]').mouseout(function(){
+          $('img[id$=btnhome2]').show();$('img[id$=btnhome1]').hide();
+         }); 
+         $('img[id$=btnlogout2]').hide();
+         $('img[id$=btnlogout1]').mouseover(function(){
+         $('img[id$=btnlogout1]').hide();$('img[id$=btnlogout2]').show();
+         });
+        $('img[id$=btnlogout2]').mouseout(function(){
+         $('img[id$=btnlogout1]').show();$('img[id$=btnlogout2]').hide();
+         }); 
+         });
+        
+          
+         function tablecss()
+         {
+              
+             $('table[id$=tblPartnerOrders]').dataTable().fnDestroy(); 
+           $('table[id$=tblPartnerOrders]').dataTable( {
+             "bPaginate": false,
+             "bLengthChange": false,
+             "bFilter": false,
+             "bSort": true,
+             "bInfo": false,
+             "bAutoWidth": false
+              } );
+             $('[id$="myBlock"]').removeClass('bPageBlock'); 
+         $("#divpagination").buttonset();
+         $($('table[id$=tblPartnerOrders]').find('tr')[0]).find('th').css({'background-color':'#724fd3','color':'white'}); 
+             $('[id$="myBlock"]').removeClass('bPageBlock'); 
+             $('[id$="myBlock"]').removeClass('secondaryPalette');
+        
+        } 
+          
+        var orderid;
+        var orderstatus;
+         
+        
+        function updateOrderStatus(id,status)
+        {
+         orderid=id;
+         true;
+        }
+        
+        function clonePartnerOrders(id)
+        {
+         orderid = id;
+         $( "#divClonePartnerOrder" ).dialog({
+           height: 100,
+           width:370,
+           modal: true
+         });  
+         return false;
+        }
+        var strMessage = "Are You Sure?";
+        function showDialog (partnerOrderId){
+           $( "#dialog-confirm").text(strMessage);
+           $( "#dialog-confirm" ).dialog({
+               resizable: false,
+               height:140,
+               modal: true,
+              
+               buttons: {
+                 "Yes": function() {
+                  $( this ).dialog( "close" );
+                  deletePartnerOrder(partnerOrderId);
+                 },
+                 "No": function() {
+                   $( this ).dialog( "close" );
+                   return false;
+                 }
+               }
+             });
+          $( "#dialog-confirm" ).dialog( "open" );
+        }
+         
+    </script>
+    <apex:form >
+        <div id="main">
+            <!-----------------------------  HeaderStart -------------------------------->
+            <div id="header">
+                <div id="divUserLogout" >
+                    <apex:panelGrid columns="2">
+                        <apex:outputLabel value="{!userDetails.name}"/>
+                        <apex:outputPanel >
+                            <div id="divhome">
+                                <apex:outputLink value="ManageOrder" >
+                                    <apex:image id="btnhome1" title="Home" style="display:none;"  value="{!URLFOR($Resource.jquery,'/jquery/Style/images/home1.png')}"      />
+                                    <apex:image id="btnhome2" title="Home" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/home2.png')}"  />
+                                </apex:outputLink>
+                                <apex:outputLabel value="  "/>
+                                <apex:outputLink value="/secur/logout.jsp">
+                                    <apex:image id="btnlogout1" title="Logout"  value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logout1.png')}"      />
+                                    <apex:image id="btnlogout2" title="Logout" style="display:none;" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logout2.png')}"  />
+                                </apex:outputLink>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:panelGrid>
+                </div>
+                <div id="divlogo" >
+                    <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logo.png')}" />
+                </div>
+            </div>
+            <!-----------------------------  HeaderEnd -------------------------------->
+            <!-----------------------------  MiddleStart -------------------------------->
+            <div id="side"  >
+                <b>S</b><br/>
+                <b>I</b><br/>
+                <b>D</b><br/>
+                <b>E</b><br/> 
+                <b>B</b><br/>
+                <b>A</b><br/>
+                <b>R</b><br/> 
+            </div>
+            <div id="middle">
+                <div id="left" style="height:100%;">
+                    <c:SideBar orderLevel="{!OrderLevel}"  userMessage="{!UserMessage}" SideBarHeight="455px" EnableCustomLinks="{!EnableCustomLinks}" EnableOrder="{!EnableOrder}" EnableBulkOrder="{!EnableBulkOrder}"/>
+                </div>
+                <div id="divMiddle" style="height: 430px;">
+                    <div id="sideButton"  >&#8249;</div>
+                </div>
+                <div id="right">
+                    <div id="divTabs">
+                        <ul>
+                            <li><a href="#divOrder">Orders</a></li>
+                            <li><a href="#divProfile">Profile</a></li>
+                        </ul>
+                        <div id="divOrder">
+                            <apex:outputPanel >
+                                <center>
+                                    <apex:outputLabel value="View: "/>
+                                    <apex:selectList id="ddlOrders" size="1"  multiselect="false" value="{!FilterID}"  >
+                                        <apex:selectOptions value="{!Views}"></apex:selectOptions>
+                                    </apex:selectList>
+                                    <apex:commandButton id="btnGo" value="Go" action="{!getRecords}"  reRender="tblOrder"  status="ProcessingStatus" style="Color:#39167c;"/>
+                                </center>
+                                <apex:actionStatus id="ProcessingStatus" startStyleClass="imageloading" onstop="tablecss(); "  >
+                                    <apex:facet name="start">
+                                        <apex:outputPanel >
+                                            <center>
+                                                <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/LoadingImage.gif')}"   style="top:10% ;position: absolute; width:100px; height:100px; "/>
+                                            </center>
+                                        </apex:outputPanel>
+                                    </apex:facet>
+                                </apex:actionStatus>
+                            </apex:outputPanel>
+                            <apex:outputPanel id="tblOrder" >
+                                <center>
+                                    <div id="divtableHeight" style="height:auto;width:auto; margin-top:2%; ">
+                                        <apex:pageBlock id="myBlock">
+                                            <apex:actionFunction name="deletePartnerOrder" action="{!DeleteOrder}" status="ProcessingStatus" reRender="tblOrder">
+                                                <apex:param name="firstParam" assignTo="{!PartnerOrderDeleteId}" value="" />
+                                            </apex:actionFunction>
+                                            <apex:pageBlockTable value="{!PartnerOrders}" id="tblPartnerOrders" var="InnerPartnerOrder" width="100%" border="1" style=" background-color':'#724fd3 "  captionStyle=" background-color':'#724fd3 "  >
+                                                <apex:column style="width:190px;max-width:190px;">
+                                                    <apex:facet name="header">Action</apex:facet>
+                                                    <a href="/DistributionPartner/apex/partnerorderstep1?EditId={!InnerPartnerOrder.PartnerOrder.Id}" style="display:{!InnerPartnerOrder.VisibilityEdit}">Edit</a>
+                                                    <apex:outputText value=" | " id="labelDelete" style="display:{!InnerPartnerOrder.VisibilityEdit}"/>
+                                                    <apex:outputLabel style="display:{!InnerPartnerOrder.VisibilityDelete};cursor:pointer;text-decoration: underline;" onclick="showDialog('{!InnerPartnerOrder.PartnerOrder.Id}')" value="Cancel"></apex:outputLabel>
+                                                    <apex:outputText value=" | " style="display:{!InnerPartnerOrder.VisibilityDelete}"/>
+                                                    <a href="/DistributionPartner/apex/partnerorderstep1?cloneId={!InnerPartnerOrder.PartnerOrder.Id}" style="display:{!InnerPartnerOrder.VisibilityClone}">Add Sibling</a>
+                                                    <a href="/DistributionPartner/apex/PartnerBulkOrder?cloneId={!InnerPartnerOrder.PartnerOrder.Id}" style="display:{!InnerPartnerOrder.VisibilityBulkClone}">Add Sibling</a>  
+                                                </apex:column>
+                                                <apex:column style="width: 100px;max-width: 100px;" >
+                                                    <apex:facet name="header">
+                                                        <apex:outputLabel value="Order"/>
+                                                    </apex:facet>
+                                                    <a href="/DistributionPartner/apex/order_summary?EditId={!InnerPartnerOrder.PartnerOrder.Id}">
+                                                        <apex:outputText value="{!InnerPartnerOrder.PartnerOrder.Name}"/>
+                                                    </a>
+                                                </apex:column>
+                                                <!--  <apex:column value="{!InnerPartnerOrder.PartnerOrder.Child_First_Name__c}" style="width: 110px;max-width: 110px;"/>-->
+                                                <apex:column style="width: 110px;max-width: 110px;">
+                                                    <apex:facet name="header">
+                                                        <apex:outputLabel value="Child’s Name"/>
+                                                    </apex:facet>
+                                                    <apex:outputText value="{!InnerPartnerOrder.PartnerOrder.Child_First_Name__c}"/>
+                                                </apex:column>
+                                                <apex:column value="{!InnerPartnerOrder.PartnerOrder.Child_Age__c}"  style="width: 100px;max-width: 100px;"/>
+                                                <apex:column style="width: 110px;max-width: 110px;" >
+                                                    <apex:facet name="header">
+                                                        <apex:outputLabel value="Contact"/>
+                                                    </apex:facet>
+                                                    <apex:outputText value="{!InnerPartnerOrder.PartnerOrder.Contact__r.Name}"/>
+                                                </apex:column>
+                                                <apex:column style="width: 130px;max-width: 130px;">
+                                                    <apex:facet name="header">
+                                                        <apex:outputPanel >
+                                                            <apex:outputLabel value=" Order Date"  />
+                                                        </apex:outputPanel>
+                                                    </apex:facet>
+                                                    <apex:outputText value="{0,date, MMMM d,  yyyy}">
+                                                        <apex:param value="{!InnerPartnerOrder.PartnerOrder.Submitted_Date__c}"/>
+                                                    </apex:outputText>
+                                                </apex:column>
+                                                <apex:column value="{!InnerPartnerOrder.PartnerOrder.Status__c}"  style="width: 120px;max-width: 120px;"/>
+                                            </apex:pageBlockTable>
+                                        </apex:pageBlock>
+                                    </div>
+                                    <div id="divpagination" style="margin-top: 1%;">
+                                        <apex:selectList value="{!NumOfItem}" multiselect="false" size="1" onchange="ItemsPerPageInJavascript(); window.scrollTo(0,0);">
+                                            <apex:selectOptions value="{!items}"/>
+                                        </apex:selectList>
+                                        <apex:commandButton action="{!first}"  disabled="{!isEnableFirst}"  title="Beginning" value="<<"   reRender="tblOrder" status="ProcessingStatus" onclick="tablecss(); "/>
+                                        <apex:commandButton action="{!previous}"  disabled="{!isEnablePrevious}" title="Previous" value="<"   reRender="tblOrder" status="ProcessingStatus" onclick="tablecss(); "/>
+                                        Page {!pageNumber} of {!TotalPages}
+                                        <apex:outputLabel value=" "/>
+                                        <apex:commandButton action="{!next}" disabled="{!isEnableNext}"  title="Next" value=">"  reRender="tblOrder" status="ProcessingStatus" onclick="tablecss(); "  />
+                                        <apex:commandButton action="{!last}"  disabled="{!isEnableLast}" title="End" value=">>"  reRender="tblOrder" status="ProcessingStatus" onclick="tablecss(); "/>
+                                    </div>
+                                </center>
+                            </apex:outputPanel>
+                            <div id="dialog-confirm" title="Delete order" style="overflow: hidden;">
+                            </div>
+                        </div>
+                        <apex:actionFunction immediate="false" action="{!ItemsPerPage}" name="ItemsPerPageInJavascript" rerender="tblOrder"  status="ProcessingStatus">
+                        </apex:actionFunction>
+                        <div id="divProfile">
+                            <apex:pageBlock id="pblockprofile">
+                                <apex:pageBlockSection columns="1"   collapsible="false" >
+                                    <div  style="width: 100%;color: black;background-color: #a97ef7;height: 20px;vertical-align: middle;padding-top: 3px;color: white;padding-left: 3px;">
+                                        <h3> USER INFORMATION</h3>
+                                    </div>
+                                    <apex:outputText value="{!userDetails.Contact.FirstName}"/>
+                                    <apex:outputText value="{!userDetails.Contact.LastName}"/>
+                                    <apex:outputText value="{!userDetails.username}"/>
+                                    <apex:outputText value="{!userDetails.Email}"/>
+                                    <apex:outputText value="{!userDetails.Contact.Account.Name}"/>
+                                    <apex:outputText value="{!userDetails.Contact.npe01__PreferredPhone__c}"/>
+                                    <apex:outputText value="{!userDetails.Contact.MobilePhone}"/>
+                                    <apex:outputText value="{!userDetails.Contact.npe01__WorkPhone__c}"/>
+                                    <apex:outputText value="{!userDetails.Contact.HomePhone}"/>
+                                    <apex:outputLabel value=""/>
+                                    <apex:pageBlockSectionItem >
+                                        <apex:outputLabel value=""/>
+                                        <apex:outputText styleClass="labelCol" value="{!SiteSpecificMessage}" />
+                                    </apex:pageBlockSectionItem>
+                                </apex:pageBlockSection>
+                            </apex:pageBlock>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-----------------------------  MiddleEnd -------------------------------->
+            <!-----------------------------  FotterStart -------------------------------->
+            <div id="fotter">
+            </div>
+            <!-----------------------------  FotterEnd -------------------------------->
+        </div>
+    </apex:form>
+</apex:page>

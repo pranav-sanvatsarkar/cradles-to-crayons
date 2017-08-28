@@ -1,0 +1,630 @@
+<apex:page controller="PartnerOrderStep1Controller" sidebar="false"  action="{!Redirect}"    showHeader="false" >
+<apex:stylesheet value="{!URLFOR($Resource.jquery, '/jquery/Style/css/smoothness/jquery-ui-1.9.0.custom.css')}"/>
+<apex:includeScript value="{!URLFOR($Resource.jquery,'/jquery/Script/jquery-1.8.2.js')}" /> 
+<apex:includeScript value="{!URLFOR($Resource.jquery,'/jquery/Script/jquery-ui-1.9.0.custom.js')}" />
+      <apex:stylesheet value="{!URLFOR($Resource.jquery, '/jquery/Style/css/PartnerOrder.css')}"/> 
+   
+<script type="text/javascript">
+ var flag='True';
+    function HideComments()
+    {
+        $('select[id$=ddlClothing]').change(function(){if($('select[id$=ddlClothing]').val()!='--None--'){ $('input[id$=txtClotingComment]').show();} else $('input[id$=txtClotingComment]').hide();  });
+        $('select[id$=ddlShoes]').change(function(){if($('select[id$=ddlShoes]').val()!='--None--'){ $('input[id$=txtShoesComment]').show();} else $('input[id$=txtShoesComment]').hide();  });
+        $('select[id$=ddlSeasonalShoes]').change(function(){if($('select[id$=ddlSeasonalShoes]').val()!='--None--'){ $('input[id$=txtSeasonalShoesComment]').show();} else $('input[id$=txtSeasonalShoesComment]').hide();  });
+        $('select[id$=ddlOuterwear]').change(function(){if($('select[id$=ddlOuterwear]').val()!='--None--'){ $('input[id$=txtOuterwearComment]').show();} else $('input[id$=txtOuterwearComment]').hide();  });
+        $('select[id$=ddlBooks]').change(function(){if($('select[id$=ddlBooks]').val()!='--None--'){ $('input[id$=txtBooksComment]').show();} else $('input[id$=txtBooksComment]').hide();  });
+         $('select[id$=ddlArtsandCrafts]').change(function(){if($('select[id$=ddlArtsandCrafts]').val()!='--None--'){ $('input[id$=txtArtsandCraftsComment]').show();} else $('input[id$=txtArtsandCraftsComment]').hide();  });
+        $('select[id$=ddlToys]').change(function(){if($('select[id$=ddlToys]').val()!='--None--'){ $('input[id$=txtToysComment]').show();} else $('input[id$=txtToysComment]').hide();  });
+        $('.ui-datepicker-trigger').change(function(){if($('input[id$=txtBirthdate]').val()!=''){ $('input[id$=txtBirthdayGiftComment]').show();} else $('input[id$=txtBirthdayGiftComment]').hide();  });
+       $('input[id$=txtBirthdate]').change(function(){if($('input[id$=txtBirthdate]').val()!=''){ $('input[id$=txtBirthdayGiftComment]').show();} else $('input[id$=txtBirthdayGiftComment]').hide();  });
+        
+        $('select[id$=ddlOuterwearAcc]').change(function(){if($('select[id$=ddlOuterwearAcc]').val()!='--None--'){ $('input[id$=txtOuterwearAccComment]').show();} else $('input[id$=txtOuterwearAccComment]').hide();  });
+        
+      $('select[id$=ddlClothing]').ready(function(){if($('select[id$=ddlClothing]').val()!='--None--'){ $('input[id$=txtClotingComment]').show();} else $('input[id$=txtClotingComment]').hide();  });
+        $('select[id$=ddlShoes]').ready(function(){if($('select[id$=ddlShoes]').val()!='--None--'){ $('input[id$=txtShoesComment]').show();} else $('input[id$=txtShoesComment]').hide();  });
+        $('select[id$=ddlSeasonalShoes]').ready(function(){if($('select[id$=ddlSeasonalShoes]').val()!='--None--'){ $('input[id$=txtSeasonalShoesComment]').show();} else $('input[id$=txtSeasonalShoesComment]').hide();  });
+        $('select[id$=ddlOuterwear]').ready(function(){if($('select[id$=ddlOuterwear]').val()!='--None--'){ $('input[id$=txtOuterwearComment]').show();} else $('input[id$=txtOuterwearComment]').hide();  });
+        $('select[id$=ddlBooks]').ready(function(){if($('select[id$=ddlBooks]').val()!='--None--'){ $('input[id$=txtBooksComment]').show();} else $('input[id$=txtBooksComment]').hide();  });
+         $('select[id$=ddlArtsandCrafts]').ready(function(){if($('select[id$=ddlArtsandCrafts]').val()!='--None--'){ $('input[id$=txtArtsandCraftsComment]').show();} else $('input[id$=txtArtsandCraftsComment]').hide();  });
+        $('select[id$=ddlToys]').ready(function(){if($('select[id$=ddlToys]').val()!='--None--'){ $('input[id$=txtToysComment]').show();} else $('input[id$=txtToysComment]').hide();  });
+        $('.ui-datepicker-trigger').ready(function(){if($('input[id$=txtBirthdate]').val()!=''){ $('input[id$=txtBirthdayGiftComment]').show();} else $('input[id$=txtBirthdayGiftComment]').hide();  });  
+        $('input[id$=txtBirthdate]').ready(function(){if($('input[id$=txtBirthdate]').val()!=''){ $('input[id$=txtBirthdayGiftComment]').show();} else $('input[id$=txtBirthdayGiftComment]').hide();  });
+        $('select[id$=ddlOuterwearAcc]').ready(function(){if($('select[id$=ddlOuterwearAcc]').val()!='--None--'){ $('input[id$=txtOuterwearAccComment]').show();} else $('input[id$=txtOuterwearAccComment]').hide();  });
+    
+    }
+    
+    
+ function dateDiffInYears(dateold, datenew) {
+            var ynew = datenew.getFullYear();
+            var mnew = datenew.getMonth();
+            var dnew = datenew.getDate();
+            var yold = dateold.getFullYear();
+            var mold = dateold.getMonth();
+            var dold = dateold.getDate();
+            var diff = ynew - yold;
+            if (mold > mnew) diff--;
+            else {
+                if (mold == mnew) {
+                    if (dold > dnew) diff--;
+                }
+            }
+            return diff;
+        }
+    
+    
+$(document).ready(function(){
+   noBack();
+    HideComments();
+    //ie dropdown cut 
+     if ($.browser.msie){
+        $('select').each(function(){
+            if($(this).attr('multiple')== false){
+                $(this)
+            .mousedown(function(){
+                if($(this).css("width") != "auto") {
+                var width = $(this).width();
+                $(this).data("origWidth", $(this).css("width"))
+                .css("width", "auto");
+            /* if the width is now less than before then undo */
+            if($(this).width() < width) {
+                $(this).unbind('mousedown');
+                $(this).css("width", $(this).data("origWidth"));
+            }
+            }
+            })
+            /* Handle blur if the user does not change the value */
+            .blur(function(){
+            $(this).css("width", $(this).data("origWidth"));
+            })
+            /* Handle change of the user does change the value */
+            .change(function(){
+            $(this).css("width", $(this).data("origWidth"));
+            
+            });
+            }
+        });
+    }
+    
+    $('table[id$=tblPartnerItems] tr td:first-child').css('text-align', 'right');
+    $("#divTabs").tabs() ;
+    $("#btnGroup").buttonset();  
+    
+    $("#divpagination").buttonset(); 
+    
+    $('input[id$=txtBirthdate]').datepicker({ dateFormat: 'mm/dd/yy', changeMonth: true,
+      changeYear: true ,showOn: "button", buttonImage: "{!URLFOR($Resource.jquery,'/jquery/Style/images/calendar.gif')}",
+      buttonImageOnly: true,
+     onSelect: function(dateText, inst) { 
+       var date = $(this).datepicker('getDate'),
+            day  = date.getDate(),  
+            month = date.getMonth() + 1,              
+            year =  date.getFullYear();
+            $('.ui-datepicker-trigger').ready(function(){if($('input[id$=txtBirthdate]').val()!=''){ $('input[id$=txtBirthdayGiftComment]').show();} else $('input[id$=txtBirthdayGiftComment]').hide();  });
+          }});
+   $('.ui-datepicker-trigger').css({'width': '18px','margin-left': '2%'});
+    
+   $('.bPageBlock ').css('border-top','1px solid white');                           
+    
+     tablecss(); 
+    
+    $("#divMiddle").click(function(){
+       $("#left").hide('drop',100);
+       $("#divMiddle").hide('drop',100);
+       $("#right").css('width','100%');
+        $("#side").css('opacity','1');
+    }).mouseover(function(){
+        $("#divMiddle").css("background-color","#D2E9FF"); 
+    }).mouseout(function(){
+        $("#divMiddle").css("background-color","white");  
+        
+    });
+    
+    $("#side").click(function(){
+       $("#left").show('drop',100);
+       $("#divMiddle").show('drop',100);
+       $("#right").css('width','83%');
+       $("#side").css('opacity','0');
+        
+    });
+    
+      
+    if($('select[id$=ddlClothing]').val()=='--None--') 
+        $('input[id$=chkboxClothing]').prop("checked",false); 
+    if($('select[id$=ddlShoes]').val()=='--None--') 
+        $('input[id$=chkboxShoes]').prop("checked",false); 
+    if($('select[id$=ddlSeasonalShoes]').val()=='--None--')              
+        $('input[id$=chkboxSeasonalShoes]').prop("checked",false);
+    if($('select[id$=ddlOuterwear]').val()=='--None--') 
+        $('input[id$=chkboxOuterwear]').prop("checked",false);
+    if($('select[id$=ddlOuterwearAcc]').val()=='--None--') 
+        $('input[id$=chkboxOuterwearAcc]').prop("checked",false); 
+    $(".ui-state-default").css('border','solid 1px #9874da');
+    $('.ui-state-active').css({color:'#8344F5',border:'2px solid #8344F5'});  
+    $('input[id$=btnSave]').removeClass().addClass('btnSubmit');  
+    $('input[id$=btnBack]').removeClass().addClass('btnSubmit');  
+      $('img[id$=btnhome1]').hide();
+    $('img[id$=btnhome2]').mouseover(function(){
+    $('img[id$=btnhome2]').hide();$('img[id$=btnhome1]').show(); 
+    });
+     $('img[id$=btnhome1]').mouseout(function(){
+     $('img[id$=btnhome2]').show();$('img[id$=btnhome1]').hide();
+    }); 
+    $('img[id$=btnlogout2]').hide();
+    $('img[id$=btnlogout1]').mouseover(function(){
+    $('img[id$=btnlogout1]').hide();$('img[id$=btnlogout2]').show();
+    });
+$('img[id$=btnlogout2]').mouseout(function(){
+    $('img[id$=btnlogout1]').show();$('img[id$=btnlogout2]').hide();
+    }); 
+     $("#divMiddle").height($("#left").height()+17+'px'); 
+    $('input[id$=txtClotingComment]').on('blur',function(){validatecomments();});
+    $('input[id$=txtShoesComment]').on('blur',function(){validatecomments();});
+    $('input[id$=txtSeasonalShoesComment]').on('blur',function(){validatecomments();});
+    $('input[id$=txtOuterwearComment]').on('blur',function(){validatecomments();});
+    $('input[id$=txtBooksComment]').on('blur',function(){validatecomments();});
+    $('input[id$=txtArtsandCraftsComment]').on('blur',function(){validatecomments();});
+    $('input[id$=txtToysComment]').on('blur',function(){validatecomments();});
+    $('input[id$=txtBirthdayGiftComment]').on('blur',function(){validatecomments();}); 
+});
+   
+ function tablecss()
+{$('[id$="myBlock"]').removeClass('bPageBlock');
+    $("#divpagination").buttonset();
+     
+} 
+  var msg;
+ function validate(e)
+{  
+     if ($('input[id$=chkboxClothing]').prop("checked"))
+        {    if ($('select[id$=ddlClothing]').val()=='--None--') 
+                {
+                    msg = ' Please Select Item.';
+                       Errorpopup();
+                       return false;
+                } 
+        }
+        if ($('select[id$=ddlClothing]').val()!='--None--') 
+        {
+            if (!$('input[id$=chkboxClothing]').prop("checked"))
+            { 
+                    msg = ' Please check the box to add to your order.';
+                       Errorpopup();
+                       return false; 
+            }
+        }
+    
+    if ($('input[id$=chkboxShoes]').prop("checked"))
+        {    
+            if ($('select[id$=ddlShoes]').val()=='--None--') 
+            {
+                   msg=' Please Select Item.';
+                       Errorpopup();
+                       return false;
+            } 
+        }
+    if ($('select[id$=ddlShoes]').val()!='--None--') 
+        {
+            if (!$('input[id$=chkboxShoes]').prop("checked"))
+            { 
+                msg = ' Please check the box to add to your order.';
+                       Errorpopup();
+                       return false; 
+            }
+        }
+    
+    if ($('input[id$=chkboxSeasonalShoes]').prop("checked"))
+        {    if ($('select[id$=ddlSeasonalShoes]').val()=='--None--') 
+             {
+                msg = ' Please Select Item.';
+                       Errorpopup();
+                       return false;
+             } 
+        } 
+    
+      if ($('select[id$=ddlSeasonalShoes]').val()!='--None--') 
+        {
+            if (!$('input[id$=chkboxSeasonalShoes]').prop("checked"))
+            { 
+                msg = ' Please check the box to add to your order.';
+                       Errorpopup();
+                       return false; 
+            }
+        }
+    if ($('input[id$=chkboxOuterwear]').prop("checked"))
+        {    
+            if ($('select[id$=ddlOuterwear]').val()=='--None--') 
+                {
+                    msg = ' Please Select Item.';
+                       Errorpopup();
+                       return false;
+                } 
+        }
+        
+        if ($('input[id$=chkboxOuterwearAcc]').prop("checked"))
+        {    
+            if( $('select[id$=ddlOuterwearAcc]').val() != undefined )
+            {
+            if ($('select[id$=ddlOuterwearAcc]').val()=='--None--') 
+                {
+                    msg = ' Please Select Item.';
+                       Errorpopup();
+                       return false;
+                }
+                } 
+        }
+        
+       if ($('select[id$=ddlOuterwear]').val()!='--None--') 
+        {
+            if (!$('input[id$=chkboxOuterwear]').prop("checked"))
+            { 
+                msg = ' Please check the box to add to your order.';
+                       Errorpopup();
+                       return false; 
+            }
+        }
+        
+         if ($('select[id$=ddlOuterwearAcc]').val()!='--None--') 
+        {
+           if($('input[id$=chkboxOuterwearAcc]').prop("checked") != undefined)
+           {
+            if (!$('input[id$=chkboxOuterwearAcc]').prop("checked"))
+            { 
+                msg = ' Please check the box to add to your ordertest.';
+                       Errorpopup();
+                       return false; 
+            }
+            }
+        }
+    if ($('input[id$=chkboxBooks]').prop("checked"))
+        {   
+             if ($('select[id$=ddlBooks]').val()=='--None--') 
+                {
+                    msg=' Please Select Item.';
+                       Errorpopup();
+                       return false;
+                } 
+        }
+      if ($('select[id$=ddlBooks]').val()!='--None--') 
+        {
+            if (!$('input[id$=chkboxBooks]').prop("checked"))
+            { 
+                msg = ' Please check the box to add to your order.';
+                       Errorpopup();
+                       return false; 
+            }
+        }
+      if ($('input[id$=chkboxArtsandCrafts]').prop("checked"))
+        {    if ($('select[id$=ddlArtsandCrafts]').val()=='--None--') 
+                {
+                   msg = ' Please Select Item.';
+                       Errorpopup();
+                       return false;
+                } 
+        }
+     if ($('select[id$=ddlArtsandCrafts]').val()!='--None--') 
+        {
+            if (!$('input[id$=chkboxArtsandCrafts]').prop("checked"))
+            { msg = ' Please check the box to add to your order.';
+                       Errorpopup();
+                       return false; 
+            }
+        }
+    if ($('input[id$=chkboxToys]').prop("checked"))
+        {    if ($('select[id$=ddlToys]').val()=='--None--') 
+                {
+                  msg = ' Please Select Item.';
+                       Errorpopup();
+                       return false;
+                } 
+        }
+     if ($('select[id$=ddlToys]').val()!='--None--') 
+        {
+            if (!$('input[id$=chkboxToys]').prop("checked"))
+            { msg = ' Please check the box to add to your order.';
+                       Errorpopup();
+                       return false; 
+            }
+        }
+     if ($('input[id$=chkboxBirthdayGift]').prop("checked"))
+        {  
+             if($('input[id$=txtBirthdate]').val()=='')
+               {
+                    msg = 'Please Enter Child Birth Date';  
+                     Errorpopup();
+                return false;
+               }
+            else if($('input[id$=txtBirthdate]').val()!='')
+                {
+                 var currdate = new Date();
+                 var olddate1 =  new Date(1989, 05, 03, 0, 0, 0,0);
+                        var old = $('input[id$=txtBirthdate]').val();
+                        old = old.split('/');
+                   var olddate = new Date(old[2], old[1], old[0], 0, 0, 0,0);
+               var diffInYears = dateDiffInYears(olddate, currdate);
+                    if(diffInYears >12)
+                        {
+                        msg = 'Birthdate should not be greater than 12 years.';  
+                        Errorpopup();
+                        return false;
+                        
+                        }
+                        
+                    
+            }
+            
+        }
+    
+    
+    
+    if($('input[id$=txtBirthdate]').val()!='')
+    {
+          if (!$('input[id$=chkboxBirthdayGift]').prop("checked"))
+              {
+                msg = ' Please check the box to add to your order.';
+                Errorpopup();
+                return false;
+              }
+    }
+    if( validatecomments() != true )
+        return false;
+        return true;
+ }       
+        
+ function validatecomments()
+{   msg='Comments should be less than 250 characters.'; 
+    
+    if($('input[id$=txtClotingComment]').val().length>249)
+    {
+        Errorpopup();
+        $('#dialog-message').width('670px');
+        return false;
+    }
+     else if($('input[id$=txtShoesComment]').val().length>249)
+     {
+        Errorpopup();
+        $('#dialog-message').width('670px');
+        return false;
+     }
+     else if($('input[id$=txtSeasonalShoesComment]').val().length>249)
+     {
+         Errorpopup();
+        $('#dialog-message').width('670px');
+        return false;
+     }
+      else if($('input[id$=txtOuterwearComment]').val().length>249)
+      {
+        Errorpopup();
+        $('#dialog-message').width('670px');
+        return false;
+     }
+      else if($('input[id$=txtBooksComment]').val().length>249)
+      {
+         Errorpopup();
+        $('#dialog-message').width('670px');
+        return false;
+     }
+      else if($('input[id$=txtShoesComment]').val().length>249)
+      {
+         Errorpopup();
+        $('#dialog-message').width('670px');
+        return false;
+       }
+      else if($('input[id$=txtArtsandCraftsComment]').val().length>249)
+       {
+         Errorpopup();
+        $('#dialog-message').width('670px');
+        return false;
+      }
+      else if($('input[id$=txtToysComment]').val().length>249)
+      {
+         Errorpopup();
+        $('#dialog-message').width('670px');
+        return false;
+     }
+     else if($('input[id$=txtBirthdayGiftComment]').val().length>249)
+     {
+        Errorpopup();
+        $('#dialog-message').width('670px');
+        return false;
+     }
+ 
+     return true;
+      
+}
+    function Errorpopup()
+    {$( "#dialog-message").css('width','300px');
+        $( "#dialog-message").text(msg);
+        $( "#dialog-message").dialog({
+          width:320,
+                 modal: true,
+                buttons: {
+                Ok: function() {
+                $( this ).dialog( "close" );
+                 } }});
+    } 
+ 
+    
+     function noenter(ev)  { 
+          if (ev.which == "13") {
+              $('input[id$=btnBack]').prop('disabled', true);
+              $('input[id$=btnSave]').click(function(){ $('input[id$=btnBack]').prop('disabled', false);}); 
+            }  
+         }
+         window.history.forward();
+        function noBack()
+        {
+            window.history.forward();
+        }
+    </script>
+  <apex:form >
+ <div id="main">
+<!-----------------------------  HeaderStart -------------------------------->
+    <div id="header">
+         <div id="divUserLogout" >  
+        <apex:panelGrid columns="2" > 
+      <apex:outputLabel value="{!userDetails.name}"/>
+         <apex:outputPanel >
+    <div id="divhome"> 
+        <apex:outputLink value="ManageOrder" >
+        <apex:image id="btnhome1" title="Home" style="display:none;" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/home1.png')}"      />
+        <apex:image id="btnhome2" title="Home"   value="{!URLFOR($Resource.jquery,'/jquery/Style/images/home2.png')}"  /></apex:outputLink>
+        <apex:outputLabel value="  "/> 
+        <apex:outputLink value="/secur/logout.jsp">
+        <apex:image id="btnlogout1" title="Logout" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logout1.png')}"      />
+        <apex:image id="btnlogout2" title="Logout"  style="display:none;" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logout2.png')}"  /></apex:outputLink>
+    </div>
+             </apex:outputPanel>
+  </apex:panelGrid>
+        </div>
+         <div id="divlogo" >
+    <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logo.png')}"   />
+        </div>
+    </div>
+<!-----------------------------  HeaderEnd -------------------------------->
+<!-----------------------------  MiddleStart -------------------------------->
+     
+     <div id="side" >
+         <b>S</b><br/>
+         <b>I</b><br/>
+         <b>D</b><br/>
+         <b>E</b><br/>
+         
+         <b>B</b><br/>
+         <b>A</b><br/>
+         <b>R</b><br/>
+         
+     </div>
+     
+    <div id="middle" style="height:100%">
+        <div id="left" style="height:100%;"> 
+            <c:SideBar orderLevel="{!OrderLevel}"  userMessage="{!UserMessage}" SideBarHeight="455px" EnableCustomLinks="{!EnableCustomLinks}" EnableOrder="{!EnableOrder}" EnableBulkOrder="{!EnableBulkOrder}"/>
+        
+        </div>
+        <div id="divMiddle" >
+            <div id="sideButton" >
+                &#8249;
+            </div>
+        
+        </div>
+        <div id="right">
+               <apex:pageBlock >
+                   <apex:pageBlockButtons location="top"> 
+         <div id="btnGroup"  >
+            <input type="radio" id="Step1" name="radio"  disabled="True" /><label for="Step1">Step 1</label>
+            <input type="radio" id="Step2" name="radio" checked="checked"  disabled="False"/><label for="Step2">Step 2</label>
+            <input type="radio" id="Step3" name="radio" disabled="true" /><label for="Step3">Step 3</label>
+        <input type="radio" id="StepReview" name="radio" disabled="true"/><label for="StepReview" >Review</label>
+        </div>     
+    </apex:pageBlockButtons> 
+    <apex:pageBlockSection title="Select item(s) below to begin creating a KidPack on behalf of this child" collapsible="false" >
+     </apex:pageBlockSection>            
+    <apex:panelGrid id="tblPartnerItems" cellpadding="1" cellspacing="10"  columns="3" width="100%"   style="text-align: center;" >      
+        <apex:outputLabel value="Add to Order"/> 
+        <apex:outputLabel value="Select Appropriate Item(s)"/> 
+        <apex:outputLabel value="Comments"/>
+        <apex:outputPanel >
+              <apex:outputLabel value="Clothing"></apex:outputLabel> 
+            <apex:inputCheckbox id="chkboxClothing" value="{!IsAddItem[0]}"/>
+        </apex:outputPanel> 
+        <apex:selectList id="ddlClothing" multiselect="false" size="1"  value="{!ClothingItemId}"   styleClass="selectItems" ><apex:selectOptions value="{!ClothingItems}"></apex:selectOptions>   </apex:selectList>              
+        <apex:inputText id="txtClotingComment" value="{!ClothingItemComment}"   onkeypress=" noenter(event);" styleClass="Comment" /> 
+        
+        <apex:outputPanel >
+           <apex:outputLabel value="Everyday Footwear"></apex:outputLabel> 
+        <apex:inputCheckbox id="chkboxShoes" value="{!IsAddItem[1]}" />
+        </apex:outputPanel>  
+        
+        <apex:selectList id="ddlShoes" multiselect="false" size="1" value="{!FootWearItemId}" styleClass="selectItems"> <apex:selectOptions value="{!footWearItems}"></apex:selectOptions>  </apex:selectList>              
+        <apex:inputText id="txtShoesComment"  value="{!FootWearItemComment}" onkeypress=" noenter(event);" styleClass="Comment"  />
+        
+         
+        <apex:outputPanel >
+            <apex:outputLabel value="Seasonal Footwear"></apex:outputLabel> 
+            <apex:inputCheckbox id="chkboxSeasonalShoes" value="{!IsAddItem[2]}"/>
+             
+        </apex:outputPanel>  
+        <apex:selectList id="ddlSeasonalShoes" multiselect="false" size="1" value="{!SeasonalFootWearItemId}" styleClass="selectItems"> <apex:selectOptions value="{!SeasonalFootWearItems}"></apex:selectOptions>  </apex:selectList>             
+        <apex:inputText id="txtSeasonalShoesComment" value="{!SeasonalFootWearItemComment}" onkeypress=" noenter(event);" styleClass="Comment" />
+               
+        <apex:outputPanel >
+         <apex:outputLabel value="Outerwear"/> 
+         <apex:inputCheckbox id="chkboxOuterwear" value="{!IsAddItem[3]}"/>
+        </apex:outputPanel>  
+            <apex:selectList id="ddlOuterwear" multiselect="false" size="1" value="{!OuterWearItemId}" styleClass="selectItems">  <apex:selectOptions value="{!OuterwearItems}"></apex:selectOptions> </apex:selectList>             
+            <apex:inputText id="txtOuterwearComment" value="{!OuterWearItemComment}" onkeypress=" noenter(event);" styleClass="Comment" />
+            
+          
+        <apex:outputPanel rendered="{!IsAddItem8Visible}">
+            <apex:outputLabel value="Outerwear Accessories"/> 
+            <apex:inputCheckbox id="chkboxOuterwearAcc" value="{!IsAddItem[8]}"/>
+        </apex:outputPanel>  
+        <apex:selectList id="ddlOuterwearAcc" multiselect="false" size="1" value="{!OuterWearAccItemId}" styleClass="selectItems" rendered="{!IsAddItem8Visible}">  <apex:selectOptions value="{!OuterwearAccItems}" rendered="{!IsAddItem8Visible}"></apex:selectOptions> </apex:selectList>             
+        <apex:inputText id="txtOuterwearAccComment" value="{!OuterWearAccItemComment}" onkeypress=" noenter(event);" styleClass="Comment" rendered="{!IsAddItem8Visible}"/>
+           
+    
+        <apex:outputPanel >
+            <apex:outputLabel value="Books"/>  
+            <apex:inputCheckbox id="chkboxBooks" value="{!IsAddItem[4]}"/>
+        </apex:outputPanel>  
+        <apex:selectList id="ddlBooks" multiselect="false" size="1" value="{!BooksItemId}" styleClass="selectItems"> <apex:selectOptions value="{!BooksItems}" ></apex:selectOptions> </apex:selectList>              
+        <apex:inputText id="txtBooksComment" value="{!BooksItemComment}" onkeypress=" noenter(event);" styleClass="Comment" />
+       
+          
+        
+        <apex:outputPanel >
+            <apex:outputLabel value="School & Art Supplies"/>  
+            <apex:inputCheckbox id="chkboxArtsandCrafts" value="{!IsAddItem[5]}"/>
+        </apex:outputPanel>  
+            <apex:selectList id="ddlArtsandCrafts" multiselect="false" size="1" value="{!ArtsCraftsItemId}" styleClass="selectItems"> <apex:selectOptions value="{!ArtsCraftsItems}" ></apex:selectOptions> </apex:selectList>              
+            <apex:inputText id="txtArtsandCraftsComment" value="{!ArtsCraftsItemComment}" onkeypress=" noenter(event);" styleClass="Comment" />
+       
+        
+        <apex:outputPanel >
+            <apex:outputLabel value="Toys"/> 
+            <apex:inputCheckbox id="chkboxToys" value="{!IsAddItem[6]}"/>
+        </apex:outputPanel>  
+        <apex:selectList id="ddlToys" multiselect="false" size="1" value="{!ToysItemId}" styleClass="selectItems"> <apex:selectOptions value="{!ToysItems}"></apex:selectOptions> </apex:selectList>       
+        <apex:inputText id="txtToysComment" value="{!ToysItemComment}" onkeypress=" noenter(event);" styleClass="Comment" />
+          
+        <apex:outputPanel >
+            <apex:outputLabel value="Birthday Gift"/>  
+            <apex:inputCheckbox id="chkboxBirthdayGift" value="{!IsAddItem[7]}"/>
+        </apex:outputPanel>  
+        <apex:inputField id="txtBirthdate"  value="{!partnerOrder.Child_Birthdate__c}" style="width: 170px;" showDatePicker="false" />
+        <apex:inputText id="txtBirthdayGiftComment"  value="{!BirthdayItemComment}" onkeypress=" noenter(event);" styleClass="Comment" />
+   
+   </apex:panelGrid>                 
+                   
+   
+      
+     <apex:pageBlockButtons location="bottom">
+        </apex:pageBlockButtons>
+            <center>
+                <div id="divbuttons" >
+                    <apex:commandButton id="btnBack" value="Back"  action="{!Step2Back}"/>
+                    <apex:commandButton id="btnSave"    value="Save & Next" action="{!saveNextStep2}" onclick="return validate();"/>
+                </div>
+            </center>
+    </apex:pageBlock>
+         
+        </div> 
+            
+   
+     </div>
+<!-----------------------------  MiddleEnd -------------------------------->
+<!-----------------------------  FotterStart -------------------------------->
+    <div id="fotter">
+    
+    </div>
+<!-----------------------------  FotterEnd -------------------------------->
+</div>
+<!--------->
+<div id="dialog-message" title="Error Message" Style="display:none;color: #FF0000;width: 300px;">
+    <p><span class="ui-icon ui-icon-circle-check" style="float: left; margin: 0 7px 50px 0;"></span>
+    <div id="divErrorMessage" style="width:100%"></div>
+    </p> 
+</div>      
+ 
+     
+ </apex:form>
+</apex:page>

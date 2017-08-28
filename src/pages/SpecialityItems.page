@@ -1,0 +1,353 @@
+<apex:page sidebar="false" showHeader="false" standardStylesheets="false" controller="SpecialityItemsController" action="{!redirectToLogin}">
+	<meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <c:GlobalResources local="{!$CurrentPage.parameters.local}" Application_JS="common-controls.js,salesforce.js,error-manager.js,community-dashboard.js,application.js" Vendor_CSS="font-awesome/css/font-awesome.min.css,bootstrap/css/bootstrap.min.css" Application_CSS="application.css"/>
+	<head>
+    	<title>Specialty Items</title>
+        <style>
+        	table[id$=tblItems] tr td:nth-child(3){
+            	width:25%;
+            }
+            @media(max-width:680px){
+            	table[id$=tblItems] tr td:nth-child(3){
+            	width:100%;
+            }
+            }
+            .messageCell{
+            	width: 100%;
+            }
+                .messageCell h4{
+                    display:none;
+                }
+            	.messageText{
+            		color: red;
+            		padding-bottom: 5px;
+            	}
+        </style>
+    	<script type="text/javascript">
+				//Validation of input fields
+				$(document).ready(function(){ 
+					$(".parent-helper").parents("table").addClass("table");
+					$('body').on('click', 'span.icon-expand', function(){
+					   var $this = $(this);
+					   $this.parent('td').siblings().toggleClass('hidePhone');
+					   $this.toggleClass("expanded")
+				        if ($this.hasClass("expanded")) 
+				            $this.html("-");
+				        else 
+				            $this.html("+");
+					});
+                    $('input[id$=txtQuantity]').attr({'type':'number','min':'2','max':'999'});
+				});
+				function Errorpopup(msg){ 
+				        $("#dialog-message").text(msg);
+				        $("#dialog-message").dialog({
+			                 width:320,
+			                 modal: true,
+			                 draggable:false,
+			                 resizable:false,
+			                 buttons: {
+						                 Ok: function() {
+						                 		$(this).dialog("close");
+						                 }
+              				 },
+              				 open:function(event, ui){
+              				 	$('.ui-dialog-titlebar-close').hide();
+              				 	var btn = $('.ui-dialog-buttonpane').find('button')
+              				 	btn.addClass('btn btn-default');
+              				 	btn.css({'font-size':'12px'});
+              				 	
+              				 }
+				          });
+				        return false;
+			    }    
+				var msg;
+        		function InlineErrorMessegeSpeciality(messege, field) {
+                    field.after("<span class='errText' style='float:right;width:calc(100% - 30px)'><span class='errHeader'>Error: </span>" + messege + "</span>");
+                }
+				function validate(e){ 
+                    $('.errText').remove();
+				    var validateFlag = true;
+                    var len = $('select[id$=ddlBulkItemType]').length;
+				    var itemcount = 0;
+				    for(var i=0; i < len; i++){ 
+				          if($($('select[id$=ddlBulkItemType]')[i]).val() != ''){ 
+					            if($($('select[name$=ddlSelectedItem]')[i]).val() == '--None--'){
+					                msg = 'Please select the item.';
+					                InlineErrorMessegeSpeciality(msg,$($('select[name$=ddlSelectedItem]')[i]));
+					                validateFlag = false;   
+					             }
+					             else if ($($('input[id$=txtQuantity]')[i]).val() <= 1){
+				                    msg = 'Quantity should be greater than 1.';
+				                    InlineErrorMessegeSpeciality(msg,$($('input[id$=txtQuantity]')[i]));
+				                    validateFlag = false;
+					             }
+					             else if((!/^[0-9]*$/.test($($('input[id$=txtQuantity]')[i]).val()))){
+			                	   msg = 'Please enter the valid quantity.';
+			                       InlineErrorMessegeSpeciality(msg,$($('input[id$=txtQuantity]')[i]));
+			                       validateFlag = false;
+					             }
+					             itemcount += 1;
+					       } 
+				    }
+				    if(itemcount == 0){
+			            msg = 'Please select atleast one item.';
+			            InlineErrorMessege(msg,'input[id$=btnAddMore]');
+			            validateFlag = false;
+				    }  
+				   
+				    if($('input[id$=txtWhoWillPickName]').val()==''){
+				       msg = 'Please enter who will pick up name.';
+				                InlineErrorMessege(msg,'input[id$=txtWhoWillPickName]');
+				                validateFlag = false;
+				     } 
+				    if($('input[id$=txtPickupEmail]').val()==''){ 
+				       msg = 'Please enter pick up email.';
+				                InlineErrorMessege(msg,'input[id$=txtPickupEmail]');
+				                validateFlag = false;
+				     }
+				     else{
+				       pattern = /^\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i ;
+				        if(!pattern.test($('input[id$=txtPickupEmail]').val())){
+				           msg = 'Email is incorrect.';
+				                InlineErrorMessegeSpeciality(msg,'input[id$=txtPickupEmail]');
+				               validateFlag = false;
+				          }
+				     }
+				     if($('input[id$=txtPickupPhone]').val() == ''){
+				       msg = 'Please enter pick phone.';
+				                InlineErrorMessege(msg,'input[id$=txtPickupPhone]');
+				                validateFlag = false;
+				     } 
+				    
+				    if (!$('input[id$=chkboxTermsAgree1]').prop("checked")|| !$('input[id$=chkboxTermsAgree2]').prop("checked")){
+				                msg = 'Please make sure you  agree  with the terms and conditions.';
+				               InlineErrorMessege(msg,"#agreeSecion");
+				               validateFlag = false;
+				    }
+                    if(!validateFlag){
+                        $($('.errText')[0]).prev().focus();
+                     }
+				    return validateFlag;
+		 		}       
+		 		function reApplyDataTable(){
+		 			for(var i=0;i<$('table[id$=tblItems] select[id$=ddlBulkItemType]').length;i++){
+                    	if($($('table[id$=tblItems] select[id$=ddlBulkItemType]')[i]).val()!=""){
+                        	$($($('table[id$=tblItems] select[id$=ddlBulkItemType]')[i]).parent().children()[0]).click();
+                        }
+                    }
+                    $('input[id$=txtQuantity]').attr({'type':'number','min':'2','max':'999'});
+		 		}
+			    function submitorder(submittype){
+				      if(validate()){
+				          if({!portalConfiguration.EnableBulkOrder__c}){
+                          		if(submittype=="submitsingle")
+                                    submitsingle();
+                              	else
+                                    submitnew();
+                          }
+				          else
+				           	 return Errorpop("At this time, we are not accepting new orders.");
+				      }
+				      else
+				       return false;
+			     }  
+    	</script>
+    	
+    </head>
+    <body ng-app="dashboardApp" style="height:100%" ng-controller="dashboardCtrl">
+    	<div id="spinnerContainer"></div>
+    	<apex:form >
+	    	<div class="main-container">
+	    		<c:TopHeader userName="{!userDetails.Name}"></c:TopHeader>
+				 <apex:actionStatus id="ProcessingStatus" startStyleClass="imageloading" onstop="tablecss();initTooltip();">
+                       <apex:facet name="start">
+                           <apex:outputPanel >
+                               <center>
+                                   <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/LoadingImage.gif')}" style="top:calc(50% - 75px) ;left: calc(50% - 75px);position: absolute; width:150px; height:150px; "/>
+                               </center>
+                           </apex:outputPanel>
+                       </apex:facet>
+             </apex:actionStatus>
+               	<c:SidebarComponent ></c:SidebarComponent>
+				<div class="container" id="applicationContainer" onclick="closeSideBar();" style="padding-top: 36px;padding-bottom: 45px;">
+					<!-- <div class="panel panel-default">
+						<div class="panel-heading"><span aria-hidden="true" class="fa fa-cubes"> </span> Available Specialty Items <i class="fa fa-question-circle" title="While KidPacks are individually tailored for specific children, Specialty items are different. Specialty items are distributed in large quantities (i.e. 55 gallon bags, boxes, cases, etc). Specialty items are quality checked prior to distribution. Please select from the available Specialty items below. (Do not see an item you were hoping to order? This item is not available for order at this time.)"></i></div>
+						<div class="panel-body">
+							While KidPacks are individually tailored for specific children, Specialty items are different. Specialty items are distributed in large quantities (i.e. 55 gallon bags, boxes, cases, etc). Specialty items are quality checked prior to distribution. Please select from the available Specialty items below. (Do not see an item you were hoping to order? This item is not available for order at this time.)
+						</div>
+					</div>-->
+                    <div>
+                        <apex:pageMessages id="errorMessage" ></apex:pageMessages>
+                    </div>
+					<apex:pageBlock id="detailInfo">
+						<div class="panel panel-default">
+							<div class="panel-heading"><span aria-hidden="true" class="fa fa-cubes"> </span> Available Specialty Items <div class="fa fa-question-circle tooltipc" rel="tooltip" title="While KidPacks are individually tailored for specific children, Specialty items are different. Specialty items are distributed in large quantities (i.e. 55 gallon bags, boxes, cases, etc). Specialty items are quality checked prior to distribution. Please select from the available Specialty items below. (Do not see an item you were hoping to order? This item is not available for order at this time.)"></div></div>
+							<div class="panel-body">
+								
+									<apex:pageBlockTable styleClass="table responsive tblItems" id="tblItems" value="{!lstBulkOrderItems}" var="partnerItem" style="margin-bottom:0px;width:100%">
+										<apex:column headerClass="hidePhone" >
+											<apex:facet name="header">
+												<apex:outputLabel value="Type"></apex:outputLabel>
+											</apex:facet>
+											<span class="icon-expand" style="float:left">+</span><apex:inputField style="width:calc(100% - 30px);float:right;margin-bottom:5px" styleClass="form-control" id="ddlBulkItemType" value="{!partnerItem.ItemBulkType.Bulk_Type__c}" onchange="FillItems('{!partnerItem.Index}')" ></apex:inputField>
+										</apex:column>
+			
+										<apex:column headerClass="hidePhone" styleClass="hidePhone">
+											<apex:facet name="header">
+												<apex:outputLabel value="Item"></apex:outputLabel>
+											</apex:facet>
+											<apex:selectList style="width:calc(100% - 30px);float:right;margin-bottom:5px" styleClass="form-control" id="ddlSelectedItem" value="{!partnerItem.SelectedItemId}" multiselect="false" size="1" >
+												<apex:selectOptions value="{!partnerItem.BulkTypeItems}"></apex:selectOptions>
+											</apex:selectList>
+										</apex:column>
+										
+										<apex:column headerClass="hidePhone" styleClass="hidePhone">
+											<apex:facet name="header">
+												<apex:outputLabel value="Quantity"></apex:outputLabel>
+											</apex:facet>
+											<apex:inputText style="width:calc(100% - 30px);float:right;margin-bottom:5px;" styleClass="form-control " id="txtQuantity" value="{!partnerItem.Quantity}" maxlength="3" onkeyup="this.value.length>=3 ? (this.value = this.value.slice(0,3)):''" />
+											<!-- <apex:commandLink value=" X " action="{!DeleteItemRow}" styleClass="btn btn-default btn-sm pull-left" reRender="tblItems" status="ProcessingStatus">
+												<apex:param name="index" value="{!partnerItem.Index}" assignTo="{!rowIndex}"/>
+											</apex:commandLink> -->
+										</apex:column>
+										<!--  <apex:column headerClass="all">
+											<apex:facet name="header">
+												<apex:outputLabel value="Action"></apex:outputLabel>
+											</apex:facet> 
+											<apex:commandLink action="{!DeleteItemRow}"  reRender="tblItems" status="ProcessingStatus" oncomplete="reApplyDataTable()">
+												<i class="fa fa-close"></i><apex:param name="index" value="{!partnerItem.Index}" assignTo="{!rowIndex}"/>
+											</apex:commandLink>
+										</apex:column>-->
+									</apex:pageBlockTable>
+									<apex:actionFunction name="FillItems" action="{!PopulateItemsByType}" oncomplete="reApplyDataTable()" reRender="tblItems" status="ProcessingStatus">
+									<apex:param name="firstParam" assignTo="{!SelectedIndex}" value="" />
+								</apex:actionFunction>
+                                <apex:actionFunction name="addRow" action="{!AddItemRows}" oncomplete="reApplyDataTable()" reRender="tblItems" status="ProcessingStatus"/>
+			
+								<br />
+								<input type="button" id="btnAddMore" value="Add More" class="btn btn-default btn-sm" onclick="addRow()" />
+								</div>
+								
+							
+						</div>
+							
+						<div class="panel panel-default">
+							<div class="panel-heading"><span aria-hidden="true" class="fa fa-truck"> </span> Pickup &amp; Distribution Information</div>
+							<div class="panel-body">
+						 		<div class="row custom-row">
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<span class="assistiveText">*</span><apex:outputLabel value="Who will pick up? " />
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputField label="" styleClass="form-control" id="txtWhoWillPickName" value="{!partnerOrder.Who_will_pick_up__c}" required="false" />
+	                                </div>
+									<div class="clearfix visible-sm-block"></div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<span class="assistiveText">*</span><apex:outputLabel value="Pickup Email " />
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputField required="false" label="" styleClass="form-control" id="txtPickupEmail" value="{!partnerOrder.Partner_Email__c}" />
+									</div>
+								</div>
+								<div class="row custom-row">
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<span class="assistiveText">*</span><apex:outputLabel value="Pickup phone" />
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputField required="false" label="" styleClass="form-control" id="txtPickupPhone" value="{!partnerOrder.Who_will_pick_up_phone__c }"/>
+	                                </div>
+									<div class="clearfix visible-sm-block "></div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<apex:outputLabel value="Location " /> <span style="color: #8474B2;" rel="tooltip" class="fa fa-question-circle" title="{!$ObjectType.Partner_Order__c.fields.Location__c.inlineHelpText}"></span>
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<apex:inputField required="false" styleClass="form-control" id="txtLocation" value="{!partnerOrder.Location__c}"/>
+									</div>
+								</div>
+								<div class="row custom-row">
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<apex:outputLabel value="Pickup Day" />
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputField required="false" label="" styleClass="form-control" value="{!partnerOrder.PickUpDay__c}" />
+	                                </div>
+									<div class="clearfix visible-sm-block"></div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<apex:outputLabel value="Pickup Hours " />
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<apex:inputField required="false" label="" value="{!partnerOrder.Pick_up_Hours__c}" />
+									</div>
+								</div>
+								
+								<div class="row custom-row" style="padding-top: 14px;">
+									<div class="col-md-12 col-sm-12 col-xs-12">
+										<apex:outputLabel value="Please take a moment to share with us the impact that receiving these items will have on a particular family you serve.In addition, we welcome you to share how providing this resource has impacted your own work with this family." style="text-align: center;" />
+									</div>
+								</div>
+								<div class="row custom-row">
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<apex:outputLabel value="Child's Story " />
+									</div>
+									<div class="col-md-7 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputTextarea id="txtChildStory"  style="resize: vertical;height:auto!important" value="{!partnerOrder.Child_s_Story__c}" />
+	                                </div>
+	                           </div>
+							</div>
+							<!--<apex:inputField styleClass="form-control parent-helper" id="txtWhoWillPickName" value="{!partnerOrder.Who_will_pick_up__c}" required="true" />
+									<apex:inputField styleClass="form-control" id="txtPickupEmail" value="{!partnerOrder.Partner_Email__c}" required="true" />
+									<apex:inputField  styleClass="form-control" id="txtPickupPhone" value="{!partnerOrder.Who_will_pick_up_phone__c }" required="true" />
+									
+									<apex:pageBlockSectionItem>
+										<span>Location <span style="color: #8474B2;" class="fa fa-question-circle" title="{!$ObjectType.Partner_Order__c.fields.Location__c.inlineHelpText}"></span> </span>
+										<apex:inputField styleClass="form-control" id="txtLocation" value="{!partnerOrder.Location__c }" required="false" />
+									</apex:pageBlockSectionItem>
+	
+									<apex:inputField styleClass="form-control" value="{!partnerOrder.PickUpDay__c}" />
+									<apex:inputField  value="{!partnerOrder.Pick_up_Hours__c}" />
+									<apex:pageBlockSection columns="1" collapsible="false">
+									<apex:outputLabel value="Please take a moment to share with us the impact that receiving these items will have on a particular family you serve." style="padding-left: 10%;" />
+									<apex:inputTextarea id="txtChildStory" styleClass="form-control" style="resize: vertical;margin-right: 57px;" value="{!partnerOrder.Child_s_Story__c}" />
+									</apex:pageBlockSection>-->
+						</div>
+						<div class="panel panel-default" id="agreeSecion">
+							<div class="panel-heading"><span aria-hidden="true" class="fa fa-check"> </span> Terms &amp; Conditions</div>
+							<div class="panel-body">
+								<apex:pageBlockSection columns="1" collapsible="false">
+										<apex:outputPanel >
+											<apex:inputCheckbox id="chkboxTermsAgree1"/> We thank you for your specialty item order. Due to overwhelming demand, Cradles to Crayons does not guarantee fulfillment of your request. (You will be notified by a C2C representative of any changes made to your request, unless otherwise stated.) By checking this box, you agree to these terms.</apex:outputPanel>
+										<apex:outputPanel >
+											<apex:inputCheckbox id="chkboxTermsAgree2" />
+											<apex:outputText value=" Cradles to Crayons remains dedicated to serving children in need. Those families who do not fit income eligibility of experiencing low-income (200% FPL) and/or homelessness are not eligible to receive items from Cradles to Crayons. I agree to these terms." />
+										</apex:outputPanel>
+								</apex:pageBlockSection>
+							</div>
+					   </div>
+					   <div class="row" style="margin-top:15px;">
+                           <!--	<apex:actionFunction name="submitsingle" action="{!submit}" status="ProcessingStatus" oncomplete="window.location.assign('{!$Site.CurrentSiteUrl}CommunityDashboard');"/>
+                           		<apex:actionFunction name="submitnew" action="{!submitnew}" status="ProcessingStatus" oncomplete="window.location.assign('{!$Site.CurrentSiteUrl}SpecialityItems');"/>
+							-->
+                           <apex:actionFunction name="submitsingle" action="{!submit}" status="ProcessingStatus" />
+                           <apex:actionFunction name="submitnew" action="{!submitnew}" status="ProcessingStatus" />
+			               	<div class="col-md-4" style="margin-bottom:5px">
+								<input type="button" class="btn btn-default btn-block" id="btnSubmit" value="Submit" onclick="submitorder('submitsingle');" />
+							</div> 
+				            <div class="col-md-4" style="margin-bottom:5px">
+				            	<input type="button" class="btn btn-default btn-block" id="btnSubmitNew" value="Submit & New" onclick="submitorder('submitnew');" />
+							</div>
+                           <div class="col-md-4" style="margin-bottom:5px">
+			               		<input type="button" class="btn btn-default btn-block" id="btnBack" value="Cancel" onclick="window.history.back();" />
+				            </div>
+               			</div>
+               			<div id="dialog-message" title="Error Message" style="display: none; color: #FF0000;">
+							<p>
+								<span class="ui-icon ui-icon-circle-check" style="float: left; margin: 0 7px 50px 0;"></span>
+								<div id="divErrorMessage"></div>
+							</p>
+						</div>
+					</apex:pageBlock>
+				</div>
+			</div>
+		</apex:form>
+	</body>
+</apex:page>

@@ -1,0 +1,351 @@
+<apex:page controller="KidpackController" sidebar="false" standardStyleSheets="false" showHeader="false" action="{!redirectToLogin}">
+<meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <c:GlobalResources local="{!$CurrentPage.parameters.local}" Application_JS="common-controls.js,salesforce.js,error-manager.js,community-dashboard.js,application.js" Vendor_JS="datatables/jquery.dataTables.min.js,datatables/dataTables.responsive.js" Vendor_CSS="font-awesome/css/font-awesome.min.css,bootstrap/css/bootstrap.min.css,datatables/jquery.dataTables.css,datatables/responsive.dataTables.css,jquery/jquery-ui-custom.css" Application_CSS="application.css"/>
+	<head>
+    	<title>Kidpack</title>
+    	<style>
+	    	.ui-widget-content{
+	    		border:1px solid #aaaaaa;
+	    	}
+	    	select{
+	    		display:inline-block;
+	    		padding:0;
+	    		height:22px;
+	    	}
+	    	.ui-widget-header {
+			    background: #8474b2;
+			}
+            .search { position: relative; }
+            .search input { text-indent: 30px;}
+            .search .fa-search { 
+              position: absolute;
+              top: 24px;
+              left: 7px;
+              font-size: 15px;
+            }
+            
+        	.messageCell{
+            	width: 100%;
+            }
+                .messageCell h4{
+                    display:none;
+                }
+            	.messageText{
+            		color: red;
+            		padding-bottom: 5px;
+            	}
+
+    	</style>
+    	<script type="text/javascript">
+		        function toggleSideBar(){
+					if($(".app-sidebar").css('display') != 'none'){
+						$("#menuBttn").css("margin-left", "8px");
+						$(".app-sidebar").css("display", "none");
+					}
+					else{
+						$("#menuBttn").css("margin-left", "182px");
+						$(".app-sidebar").css({"position": "fixed", "top": 0, "bottom": 0, "display":"inline-block"});
+					}
+				}
+				function closeSideBar(){
+					$("#menuBttn").css("margin-left", "8px");
+					$(".app-sidebar").css("display", "none");
+				}
+				//Validation of input fields
+        //	$(document).ready(function(){ 
+        //			$(".parent-helper").parents("table").addClass("table");
+        //				$('input[id$=txtBirthdate]').datepicker({ 
+        //			 	dateFormat: 'mm/dd/yy', 
+        //			 	changeMonth: true,
+        //	     		changeYear: true ,
+        //	    		onSelect: function(dateText, inst) { 
+        //	      					var date = $(this).datepicker('getDate'),
+        //				            day  = date.getDate(),  
+        //month = date.getMonth() + 1,              
+        //				            year =  date.getFullYear();
+        //$('.ui-datepicker-trigger').ready(function(){
+        //	           			    	if($('input[id$=txtBirthdate]').val()!=''){ 
+        //	           			    		$('input[id$=txtBirthdayGiftComment]').show();
+        //	           			    	} 
+        //	           			    	else 
+        //	           			    	$('input[id$=txtBirthdayGiftComment]').hide();  
+        //	           	 			});
+        //      		}
+        //      	});
+        //Not to uncomment      	//$(".ui-datepicker-trigger").addClass("fa fa-calender")
+        //            $('.ui-datepicker-trigger').addClass('fa fa-calendar');
+        //            $('.ui-datepicker-trigger').removeAttr("src alt title");
+        //            $('.ui-datepicker-trigger').attr("id","dateMarker");
+        //			$('.ui-datepicker-trigger').css({'float': 'left','margin-left':'4px','height':'31px','font-size':'28px','color':'#612d9c'});
+        //			
+        //		});
+        		function Errorpopup(msg){ 
+				        $("#dialog-message").text(msg);
+				        $("#dialog-message").dialog({
+			                 width:320,
+			                 modal: true,
+			                 draggable:false,
+			                 resizable:false,
+			                 buttons: {
+						                 Ok: function() {
+						                 		$(this).dialog("close");
+						                 }
+              				 },
+              				 open:function(event, ui){
+              				 	$('.ui-dialog-titlebar-close').hide();
+              				 	var btn = $('.ui-dialog-buttonpane').find('button')
+              				 	btn.addClass('btn btn-default');
+              				 	btn.css({'font-size':'12px'});
+              				 	
+              				 }
+				          });
+				        return false;
+			    }   
+        //			    function dateDiffInYears(dateold, datenew){
+                //           var ynew = datenew.getFullYear();
+                //  var mnew = datenew.getMonth();
+                // var dnew = datenew.getDate();
+                // var yold = dateold.getFullYear();
+                // var mold = dateold.getMonth();
+                // var dold = dateold.getDate();
+                // var diff = ynew - yold;
+                // if (mold > mnew) diff--;
+                // else{
+                //     if (mold == mnew){
+                //         if (dold > dnew) diff--;
+                //     }
+                // }
+                // return diff;
+                //} 
+                //        function checkdate(input){
+                //    var arrInput = input.split("/");
+                //   if(arrInput.length==3 && (arrInput[0].length==2 || arrInput[0].length==1) && (arrInput[1].length==2 || arrInput[1].length==1) && arrInput[2].length==4){
+                //  	if(!isNaN(parseInt(arrInput[0])) && !isNaN(parseInt(arrInput[1])) && !isNaN(parseInt(arrInput[2]))){
+                //      	if(parseInt(arrInput[0])<=12 && parseInt(arrInput[0])>0 && parseInt(arrInput[1])>0 && parseInt(arrInput[2])>0){
+                //          	var arrMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
+                //              var arrLeapMonth = [31,29,31,30,31,30,31,31,30,31,30,31];
+                //              if(parseInt(arrInput[2])%4==0){
+                //              	if(parseInt(arrInput[1])<=arrLeapMonth[parseInt(arrInput[0])-1])
+                //                     return true;
+                //                  else
+                //                     return false
+                //              }else{
+                //              	if(parseInt(arrInput[1])<=arrMonth[parseInt(arrInput[0])-1])
+                //                     return true;
+                //                  else
+                //                     return false
+                //              }
+                //          }else{
+                //          	return false;
+                //          }
+                //         
+                //      }else{
+                //      	return false;
+                //      }
+                //  }else{
+                //  	return false;
+                //    }
+                //}
+				function validate(e){
+                    $('.errText').remove();
+                    var validationFlag = true;
+				    if($('input[id$=txtCaregiverFirstName]').val() == ''){
+				           InlineErrorMessege('Please enter First Name.','input[id$=txtCaregiverFirstName]');
+				           validationFlag = false;
+				    }
+				    if($('input[id$=txtCaregiverChildLastName]').val() == ''){
+				           InlineErrorMessege('Please enter Last Name.','input[id$=txtCaregiverChildLastName]');
+				           validationFlag = false;
+					}
+					if($('input[id$=txtPartnerEmail]').val() == '' ){ 
+                		InlineErrorMessege('Please enter Pick Email.','input[id$=txtPartnerEmail]');
+                		validationFlag = false;
+       				}
+    				else{
+                        pattern = /^\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i;
+				        if(!pattern.test($('input[id$=txtPartnerEmail]').val())){
+			                InlineErrorMessege('Please enter Valid Email.','input[id$=txtPartnerEmail]');
+			                validationFlag = false;
+				        }
+        			}
+    				if($('input[id$=txtPickerName]').val() == ''){
+           				InlineErrorMessege('Please enter Picker Name.','input[id$=txtPickerName]');
+           				validationFlag = false;
+       				}
+       	 			if($('input[id$=txtPhone]').val() == '') {
+           				InlineErrorMessege('Please enter Picker Phone.','input[id$=txtPhone]');
+           				validationFlag = false;
+       				}
+           			if($('input[id$=txtZipCode]').val() == ''){
+            			 InlineErrorMessege('Please enter Home Zip code.','input[id$=txtZipCode]');
+           				 validationFlag = false;
+                	}
+                    if(!validationFlag){
+                        $($('.errText')[0]).prev().focus();
+                     }
+		       		return validationFlag;
+    			}
+    	</script>
+    	
+    </head>
+    <!--Commented Code from Script
+                    if($('input[id$=txtBirthdate]').val() != ''){
+                        //var validformat=/^\d{2}\/\d{2}\/\d{4}$/;
+                         if(!checkdate($('input[id$=txtBirthdate]').val())){
+			                InlineErrorMessege('Please enter valid birthdate.','#dateMarker');
+           				 	validationFlag = false;
+				        }else{
+                        	var currdate = new Date();
+		                	var olddate1 =  new Date(1989, 05, 03, 0, 0, 0,0);
+		                    var old = $('input[id$=txtBirthdate]').val();
+		                    old = old.split('/');
+		                  	var olddate = new Date(old[2], old[1], old[0], 0, 0, 0,0);
+		              		var diffInYears = dateDiffInYears(olddate, currdate);
+		                   	if(diffInYears > 12){
+		                       InlineErrorMessege('Birthdate should not be greater than 12 years.','#dateMarker');
+		                       validationFlag = false;
+		                    }
+
+                        }
+                	}else{
+                	if ($('input[id$=chkboxBirthdayGift]').prop("checked")){  
+			            if($('input[id$=txtBirthdate]').val() == ''){
+			                    InlineErrorMessege('Please Enter Child Birth Date','#dateMarker');
+			               		validationFlag = false;
+			            }
+		           		else if($('input[id$=txtBirthdate]').val() != ''){
+		                	var currdate = new Date();
+		                	var olddate1 =  new Date(1989, 05, 03, 0, 0, 0,0);
+		                    var old = $('input[id$=txtBirthdate]').val();
+		                    old = old.split('/');
+		                  	var olddate = new Date(old[2], old[1], old[0], 0, 0, 0,0);
+		              		var diffInYears = dateDiffInYears(olddate, currdate);
+		                   	if(diffInYears > 12){
+		                       InlineErrorMessege('Birthdate should not be greater than 12 years.','#dateMarker');
+		                       validationFlag = false;
+		                    }
+		         		}
+		       		}
+                    }
+	-->
+    <body ng-app="dashboardApp" style="height:100%" ng-controller="dashboardCtrl">
+    	<div id="spinnerContainer"></div>
+    	<apex:form >
+	    	<div class="main-container">
+    			<c:TopHeader userName="{!userDetails.Name}"></c:TopHeader>
+                <apex:outputPanel id="sidebar" layout="block">
+					<c:SidebarComponent ></c:SidebarComponent>
+                </apex:outputPanel>
+				<apex:actionStatus id="ProcessingStatus" startStyleClass="imageloading" onstop="tablecss();initTooltip();">
+                       <apex:facet name="start">
+                           <apex:outputPanel >
+                               <center>
+                                   <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/LoadingImage.gif')}" style="top:calc(50% - 75px) ;left: calc(50% - 75px);position: absolute; width:150px; height:150px; "/>
+                               </center>
+                           </apex:outputPanel>
+                       </apex:facet>
+             	</apex:actionStatus>
+				<div class="container" id="applicationContainer"  style="padding-top:30px;padding-bottom:30px">
+				<!-- Progress tracker starts here -->
+					<div class="row">
+						<ol class="progress-tracker col-md-12 col-sm-12 col-xs-12">
+							  <li class="step col-md-2  col-sm-2 col-xs-2 col-md-offset-1 " style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2 active" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+						</ol>
+					</div>
+                    <div>
+                        <apex:pageMessages id="errorMessage" ></apex:pageMessages>
+                    </div>
+					<div class="panel panel-default">
+							<div class="panel-heading">
+								<span aria-hidden="true" class="fa fa-child"> </span> Kidpack - Caregiver &amp; Pick-up Information
+							</div>
+							<div class="panel-body">
+						 		<div class="row custom-row">
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<span class="assistiveText">*</span><apex:outputLabel value="Caregiver's First Name"/>
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputField label="" styleClass="form-control" id="txtCaregiverFirstName" value="{!partnerOrder.Caregiver_s_First_name__c}" required="true" />
+	                                </div>
+									<div class="clearfix visible-sm-block"></div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<span class="assistiveText">*</span><apex:outputLabel value="Caregiver's Last Name "/> <span rel="tooltip" class="fa fa-question-circle" title="{!$ObjectType.Partner_Order__c.fields.Caregiver_s_Last_name__c.inlineHelpText}"></span>
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputField label="" styleClass="form-control" id="txtCaregiverChildLastName" value="{!partnerOrder.Caregiver_s_Last_name__c}" required="true" />
+									</div>
+								</div>
+								<hr style="border-top: 1px solid #ddd;"/>
+						 		<div class="row custom-row">
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<span class="assistiveText">*</span><apex:outputLabel value="Who will pick up?"/>
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputField label="" styleClass="form-control" id="txtPickerName" value="{!partnerOrder.Who_will_pick_up__c}" required="true" />
+	                                </div>
+									<div class="clearfix visible-sm-block"></div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<span class="assistiveText">*</span><apex:outputLabel value="Phone "/> <span rel="tooltip" class="fa fa-question-circle" title="{!$ObjectType.Partner_Order__c.fields.Partner_Email__c.inlineHelpText}"></span>
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputField label="" styleClass="form-control" id="txtPhone" value="{!partnerOrder.Who_will_pick_up_phone__c}" required="true" />
+									</div>
+								</div>
+								<div class="row custom-row">
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<span class="assistiveText">*</span><apex:outputLabel value="Pickup Email"/>
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputField label="" styleClass="form-control" id="txtPartnerEmail" value="{!partnerOrder.Partner_Email__c}" required="true" />
+	                                </div>
+									<div class="clearfix visible-sm-block"></div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<apex:outputLabel value="Location "></apex:outputLabel> <span rel="tooltip" class="fa fa-question-circle" title="{!$ObjectType.Partner_Order__c.fields.Location__c.inlineHelpText}"></span>
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										 <apex:inputField id="txtLocation"  styleclass="form-control" value="{!partnerOrder.Location__c}"/>
+									</div>
+								</div>
+								<!--<div class="row custom-row">
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<apex:outputLabel value="Date of birth"/>
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+                                        <apex:inputField html-placeholder="mm/dd/yyyy" id="txtBirthdate" value="{!partnerOrder.Child_Birthdate__c}" styleClass="form-control" showDatePicker="false" /><i id="dateMarker" class="fa fa-calendar" style="margin-top: -22px;float: right;margin-right: 5px;"></i>
+	                                </div>
+									<div class="clearfix visible-sm-block"></div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<apex:outputLabel value="Birthday Gift?"/>
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<apex:inputCheckbox id="chkboxBirthdayGift" value="{!IsBirthdayItem}"/>
+									</div>
+								</div>-->
+							</div>
+					</div>	
+					<apex:actionFunction action="{!saveStepTwo}" name="saveStepTwo"> </apex:actionFunction>
+					<div class="row">
+                         <div class="col-md-4 col-sm-4 col-xs-12" style="margin-bottom:5px">
+					 		<input type="button" id="btnCancel" Class="btn btn-default btn-block" value="Cancel" onclick="getCancelSpeciality();"/>
+					 	</div>
+					 	<div class="col-md-4 col-sm-4 col-xs-12" style="margin-bottom:5px">
+					 		<apex:commandButton id="btnCancel" styleClass="btn btn-default btn-block" value="Back" action="{!Step2Back}" immediate="true"/>
+					 	</div>
+                       
+					 	<div class="col-md-4 col-sm-4 col-xs-12" style="margin-bottom:5px">
+					 		 <apex:commandButton id="btnSave" value="Save & Next" styleClass="btn btn-default btn-block" onclick="if(validate()){saveStepTwo();}return false;" status="ProcessingStatus" />  
+					 	</div>
+					 </div>
+				</div>
+				<div id="dialog-message" style="overflow: hidden;z-index: 999999;">
+           		</div>
+			</div>
+			
+		</apex:form>
+    </body>
+</apex:page>

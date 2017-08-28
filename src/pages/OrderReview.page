@@ -1,0 +1,231 @@
+<apex:page sidebar="false" showHeader="false" standardStylesheets="false" controller="OrderReviewController" action="{!redirectToLogin}">
+	<meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <c:GlobalResources local="{!$CurrentPage.parameters.local}" Application_JS="common-controls.js,salesforce.js,error-manager.js,community-dashboard.js,application.js" Vendor_JS="datatables/jquery.dataTables.min.js,datatables/dataTables.responsive.js" Vendor_CSS="font-awesome/css/font-awesome.min.css,bootstrap/css/bootstrap.min.css,datatables/jquery.dataTables.css,datatables/responsive.dataTables.css" Application_CSS="application.css"/>
+	<head>
+    	<title>Order Review</title>
+    	<script type="text/javascript">
+			$(document).ready(function(){ 
+				 $('.tblItems').DataTable({
+				 	paging: false,
+				 	ordering: false,
+				 	bPaginate: false,
+		            bLengthChange: false,
+		            bFilter: false,
+		            bSort: true,
+		            bInfo: false,
+				 });
+				 if($('.dataTables_empty'))
+				 	$('.dataTables_empty').html("There are no items in this order.");
+			});
+				
+ 		</script>
+	 	<style>
+		 	table.dataTable thead th, table.dataTable tfoot th {
+			   font-weight: bold;
+			   text-align: justify;
+			}
+			.nopadding{
+				padding:0px;
+			}
+			table.dataTable > tbody > tr.child span.dtr-title {
+			    display: inline-block;
+			    min-width: 150px;
+			    font-weight: bold;
+			}   
+            .messageCell{
+            	width: 100%;
+            }
+                .messageCell h4{
+                    display:none;
+                }
+            	.messageText{
+            		color: red;
+            		padding-bottom: 5px;
+            	}
+	 	</style>
+</head>
+    <body ng-app="dashboardApp" style="height:100%" ng-controller="dashboardCtrl">
+    	<div id="spinnerContainer"></div>
+    	<apex:form >
+    	<div class="main-container">
+				 <apex:actionStatus id="ProcessingStatus" startStyleClass="imageloading" onstop="tablecss();initTooltip();">
+                       <apex:facet name="start">
+                           <apex:outputPanel >
+                               <center>
+                                   <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/LoadingImage.gif')}" style="top:calc(50% - 75px) ;left: calc(50% - 75px);position: absolute; width:150px; height:150px; "/>
+                               </center>
+                           </apex:outputPanel>
+                       </apex:facet>
+            	 </apex:actionStatus>
+               	 <c:TopHeader userName="{!userDetails.Name}"></c:TopHeader>
+				 <c:SidebarComponent ></c:SidebarComponent>
+				 <div class="container" id="applicationContainer"  style="padding-top:30px;padding-bottom:30px">
+					
+					  <!--<div class="panel panel-default">
+							<div class="panel-heading"><span aria-hidden="true" class="fa fa-eye"> </span> Review</div>
+							<div class="panel-body">
+								Please ensure that following information is correct, then click Submit at the end of the order.
+							</div>
+					  </div>-->
+					 <!--  <div class="row custom-row">
+							<div class="col-md-3 col-sm-6 col-xs-12">
+								<apex:outputLabel style="font-size: large;" value="Order Number " />
+							</div>
+							<div class="col-md-3 col-sm-6 col-xs-12">
+		                     	<apex:outputtext value="{!partnerOrder.Name}" />
+		                     </div>
+							<div class="clearfix visible-sm-block"></div>
+							<div class="col-md-3 col-sm-6 col-xs-12">
+								<apex:outputLabel style="font-size: large;" value="Order Status " />
+							</div>
+							<div class="col-md-3 col-sm-6 col-xs-12">
+		                        <apex:outputtext value="{!partnerOrderStatus}" />
+							</div>
+					  </div> -->
+					  <apex:pageblock >
+		<div>
+			<apex:pageMessages id="errorMessage" ></apex:pageMessages>
+		</div>
+	 <div class="panel panel-default">
+		<div class="panel-heading"><span aria-hidden="true" class="fa fa-cubes"> </span> Order Details</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+					<apex:outputLabel value="Order Number :" />
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+	                   	<apex:outputtext value="{!partnerOrder.Name}" />
+	            </div>
+	            <div class="clearfix visible-sm-block"></div>
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+					<apex:outputLabel value="Order Status :" />
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+	            	<apex:outputtext value="{!partnerOrderStatus}" />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+					<apex:outputLabel value="Child's Name :" />
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+	                           	<apex:outputtext value="{!partnerOrder.Child_First_Name__c} {!partnerOrder.Child_Last_Name__c}" />
+	                           </div>
+				<div class="clearfix visible-sm-block"></div>
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+					<apex:outputLabel value="Caregiver's Name :" />
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+	                           	<apex:outputtext value="{!partnerOrder.Caregiver_s_First_name__c} {!partnerOrder.Caregiver_s_Last_name__c}" />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+					<apex:outputLabel value="Gender :" />
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+	                           	<apex:outputtext value="{!partnerOrder.Child_Gender__c}" />
+	                           </div>
+				<div class="clearfix visible-sm-block"></div>
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+					<apex:outputLabel value="Who will pick up :" />
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+	                           	<apex:outputtext value="{!partnerOrder.Who_will_pick_up__c}" />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+					<apex:outputLabel value="Age :" />
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+	                           	<apex:outputtext value="{!partnerOrder.Child_Age__c}" />
+	                           </div>
+				<div class="clearfix visible-sm-block"></div>
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+					<apex:outputLabel value="Phone :" />
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+	                           	<apex:outputtext value="{!partnerOrder.Who_will_pick_up_phone__c}" />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+					<apex:outputLabel value="Home Zip :" />
+				</div>
+				<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+	            	<apex:outputtext value="{!partnerOrder.Child_Home_Zip_Code__c}" />
+	            </div>
+				<div class="clearfix visible-sm-block"></div>
+				<apex:outputpanel styleClass="col-md-3 col-sm-6 col-xs-12 custom-row" rendered="{!partnerOrder.Emergency_Order__c}">
+                	<apex:outputLabel value="Emergency :" />
+                </apex:outputpanel>
+			
+				<apex:outputpanel styleClass="col-md-3 col-sm-6 col-xs-12 custom-row" rendered="{!partnerOrder.Emergency_Order__c}">
+                	<apex:outputfield value="{!partnerOrder.Emergency_Order__c}" />
+                </apex:outputpanel>
+			</div>
+			<div class="row">
+					<apex:outputpanel styleClass="col-md-3 col-sm-6 col-xs-12 custom-row" rendered="{!partnerOrder.Emergency_Order__c}">
+	                	<apex:outputLabel value="Emergency Type :" />
+	                </apex:outputpanel>
+				
+					<apex:outputpanel styleClass="col-md-3 col-sm-6 col-xs-12 custom-row" rendered="{!partnerOrder.Emergency_Order__c}">
+	                	<apex:outputfield value="{!partnerOrder.Emergency_Type__c}" />
+	                </apex:outputpanel>
+				
+					<div class="clearfix visible-sm-block"></div>
+				
+					<apex:outputpanel styleClass="col-md-3 col-sm-6 col-xs-12 custom-row" rendered="{!partnerOrder.Emergency_Order__c}">
+                    	<apex:outputLabel value="Emergency Reason :" />
+                    </apex:outputpanel>
+			
+					<apex:outputpanel styleClass="col-md-3 col-sm-6 col-xs-12 custom-row" rendered="{!partnerOrder.Emergency_Order__c}">
+                     	<apex:outputfield value="{!partnerOrder.Emergency_Reason__c}" />
+                 	</apex:outputpanel>
+			</div>
+		<!-- <div class="row custom-row">
+                           <div class="col-md-3 col-sm-6 col-xs-12">
+				<apex:outputLabel value ="Order Status : " />
+			</div>
+			<div class="col-md-3 col-sm-6 col-xs-12">
+                           	<apex:outputtext value ="{!partnerOrderStatus}" />
+                           </div>
+	  	</div>-->
+	  	<div class="row">
+			<div class="col-md-3 col-sm-6 col-xs-12 custom-row">
+				<apex:outputLabel value="Child's Story :" />
+			</div>
+			<div class="col-md-9 col-sm-6 col-xs-12 custom-row">
+                           	<apex:outputtext value="{!partnerOrder.Child_s_Story__c}" />
+                           </div>
+	  	</div>
+ 		</div>
+ 	</div>
+ 	<div class="panel panel-default">
+ 		<div class="panel-heading"><span aria-hidden="true" class="fa fa-list"> </span> Items</div>
+ 		<div class="panel-body" style="padding:0">
+                   <apex:pageblocktable styleClass="table table-striped  display responsive tblItems" value="{!lstPartnerOrderItem}" var="item" width="100%" captionStyle="background-color':'#724fd3">
+                         <apex:column headerClass="desktop"><apex:outputText value="{!item.Item__r.Name}"></apex:outputText> </apex:column>
+                         <apex:column headerClass="desktop" value="{!item.Qty_Fulfilled__c}"  />
+                         <apex:column headerClass="desktop" value="{!item.Qty_Ordered__c}"  />
+                   </apex:pageblocktable> 
+                 </div>
+              </div>
+                 <center>
+                      <div id="divbuttons" style="text-align:center">
+                            <span style="display:{!submitSpanVisiblity}">Please review the order and order items before submission.<br /><br /></span>
+                      		<a id="btnAddBulkSibbling" class="btn btn-default" style="margin-left:10px;margin-bottom:10px;display:{!bulkCloneVisiblity}" href="{!$Site.CurrentSiteUrl}SpecialityItems?cloneId={!orderId}">Add Sibling</a>
+                      		<a id="btnAddSibbling" class="btn btn-default" style="margin-left:10px;margin-bottom:10px;display:{!cloneVisiblity}" href="{!$Site.CurrentSiteUrl}kidpackstepone?cloneId={!orderId}">Add Sibling</a>
+                          	<a id="btnEdit" class="btn btn-default" style="margin-left:10px;margin-bottom:10px;display:{!editVisiblity}" href="{!$Site.CurrentSiteUrl}kidpackstepone?editId={!orderId}">Edit</a>
+                            <apex:commandbutton action="{!submitOrder}" id="btnSubmit" style="margin-left:10px;margin-bottom:10px;display:{!submitVisiblity}" styleclass="btn btn-default" value="Submit" status="ProcessingStatus"></apex:commandbutton> 
+                            <apex:commandbutton action="{!submitAndNew}" id="btnSubmitNew" style="margin-left:10px;margin-bottom:10px;display:{!submitVisiblity}" styleclass="btn btn-default" value="Submit & New" status="ProcessingStatus"></apex:commandbutton>  
+                            <button type="button" id="btnBackToDashboard" style="margin-left:10px;margin-bottom:10px;" class="btn btn-default" onClick="getReviewCancel();">Back</button>   
+                      </div>
+                 </center>
+             </apex:pageblock>
+		</div>
+	</div>
+</apex:form>
+</body>
+</apex:page>

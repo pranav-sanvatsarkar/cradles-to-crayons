@@ -1,0 +1,239 @@
+<apex:page controller="PartnerOrderStep1Controller" sidebar="false" action="{!Redirect}"  showHeader="false" >
+      <apex:stylesheet value="{!URLFOR($Resource.jquery, '/jquery/Style/css/smoothness/jquery-ui-1.9.0.custom.css')}"/>
+   <apex:includeScript value="{!URLFOR($Resource.jquery,'/jquery/Script/jquery-1.8.2.js')}" /> 
+<apex:includeScript value="{!URLFOR($Resource.jquery,'/jquery/Script/jquery-ui-1.9.0.custom.js')}" />
+      <apex:stylesheet value="{!URLFOR($Resource.jquery, '/jquery/Style/css/PartnerOrder.css')}"/> 
+    <script type="text/javascript">
+ var flag='True';
+$(document).ready(function(){ 
+	noBack();
+    $("#divTabs").tabs() ;
+    $("#btnGroup").buttonset();  
+      
+    $("#divpagination").buttonset();
+    $('.bPageBlock ').css('border-top','1px solid white');                           
+    $('input[id$=txtBirthdate]').val('');
+     tablecss(); 
+    
+    $("#divMiddle").click(function(){
+       $("#left").hide('drop',100);
+       $("#divMiddle").hide('drop',100);
+       $("#right").css('width','100%');
+        $("#side").css('opacity','1');
+    }).mouseover(function(){
+        $("#divMiddle").css("background-color","#D2E9FF"); 
+    }).mouseout(function(){
+        $("#divMiddle").css("background-color","white");  
+        
+    });
+    
+    $("#side").click(function(){
+       $("#left").show('drop',100);
+       $("#divMiddle").show('drop',100);
+       $("#right").css('width','83%');
+        $("#side").css('opacity','0');
+    });
+    $(".ui-state-default").css('border','solid 1px #9874da');
+    $('.ui-state-active').css({color:'#8344F5',border:'2px solid #8344F5'});
+     $('input[id$=btnBack]').removeClass().addClass('btnSubmitandNew');  
+    $('input[id$=btnSubmitNew]').removeClass().addClass('btnSubmitandNew');  
+    $('input[id$=btnSubmit]').removeClass().addClass('btnSubmitandNew');
+      $('img[id$=btnhome1]').hide();
+    $('img[id$=btnhome2]').mouseover(function(){
+    $('img[id$=btnhome2]').hide();$('img[id$=btnhome1]').show(); 
+    });
+     $('img[id$=btnhome1]').mouseout(function(){
+     $('img[id$=btnhome2]').show();$('img[id$=btnhome1]').hide();
+    }); 
+    $('img[id$=btnlogout2]').hide();
+    $('img[id$=btnlogout1]').mouseover(function(){
+    $('img[id$=btnlogout1]').hide();$('img[id$=btnlogout2]').show();
+    });
+$('img[id$=btnlogout2]').mouseout(function(){
+    $('img[id$=btnlogout1]').show();$('img[id$=btnlogout2]').hide();
+    }); 
+    $("#divMiddle").height($("#left").height()+17+'px');
+    
+});   
+ function tablecss()
+{$($('table[id$=tblItems]').find('a')).removeAttr('onmouseout onfocus onblur onmouseover id href').css('text-decoration','none');
+    
+    $('[id$="myBlock"]').removeClass('bPageBlock');
+    $("#divpagination").buttonset();
+      
+} 
+ var strMessage = "At this time, we are not accepting new orders.";
+function Errorpopup()
+    { 
+        
+        $( "#dialog-message").text(strMessage);
+        $( "#dialog-message").dialog({
+                 width:320,
+                 modal: true,
+                 
+                buttons: {
+                Ok: function() {
+                $( this ).dialog( "close" );
+               
+                 } }});
+                return false;
+    }    
+function submitorder()
+{
+     if( {!portalConfiguration.EnableOrder__c} )
+       return true;
+      else
+      {
+        Errorpopup();
+        return false;
+      }
+ 
+}
+window.history.forward();
+        function noBack()
+        {
+            window.history.forward();
+        }
+</script>
+<apex:form >
+<div id="main">
+<!-----------------------------  HeaderStart -------------------------------->
+<div id="header"> 
+    <div id="divUserLogout" >  
+    <apex:panelGrid columns="2"> 
+    <apex:outputLabel value="{!userDetails.name}"/>
+    <apex:outputPanel >
+    <div id="divhome"> 
+        <apex:outputLink value="ManageOrder" >
+        <apex:image id="btnhome1" title="Home" style="display:none;" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/home1.png')}"      />
+        <apex:image id="btnhome2" title="Home"  value="{!URLFOR($Resource.jquery,'/jquery/Style/images/home2.png')}"  /></apex:outputLink>
+        <apex:outputLabel value="  "/> 
+        <apex:outputLink value="/secur/logout.jsp">
+        <apex:image id="btnlogout1" title="Logout" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logout1.png')}"      />
+        <apex:image id="btnlogout2" title="Logout" style="display:none;" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logout2.png')}"  /></apex:outputLink>
+    </div>
+    </apex:outputPanel>
+  </apex:panelGrid>
+</div>
+    <div id="divlogo" >
+        <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logo.png')}"   />
+    </div>
+</div>
+<!-----------------------------  HeaderEnd -------------------------------->
+<!-----------------------------  MiddleStart -------------------------------->
+<div id="side" >
+    <b>S</b><br/>
+    <b>I</b><br/>
+    <b>D</b><br/>
+    <b>E</b><br/> 
+    <b>B</b><br/>
+    <b>A</b><br/>
+    <b>R</b><br/> 
+</div> 
+<div id="middle">
+    <div id="left" style="height:100%;"> 
+    <c:SideBar orderLevel="{!OrderLevel}"  userMessage="{!UserMessage}" SideBarHeight="455px" EnableCustomLinks="{!EnableCustomLinks}" EnableOrder="{!EnableOrder}" EnableBulkOrder="{!EnableBulkOrder}"/>
+    </div>
+    <div id="divMiddle" >
+    <div id="sideButton"  >&#8249;</div>
+    </div>
+    <div id="right">
+<apex:pageBlock >
+    <apex:pageBlockButtons location="top"> 
+        <div id="btnGroup"  >
+        <input type="radio" id="Step1" name="radio"  disabled="True" /><label for="Step1">Step 1</label>
+        <input type="radio" id="Step2" name="radio"   disabled="True"/><label for="Step2">Step 2</label>
+        <input type="radio" id="Step3" name="radio"  disabled="True" /><label for="Step3">Step 3</label>
+        <input type="radio" id="StepReview" name="radio" checked="checked" disabled="False"/><label for="StepReview" >Review</label>
+        </div>
+    </apex:pageBlockButtons>
+    <apex:pageBlockSection title="REVIEW"  collapsible="false" columns="1" dir="center" >  
+        <apex:outputText value="Please ensure the following information is correct, then click Submit at the end of the order."/> 
+    </apex:pageBlockSection>
+    <apex:pageBlockSection title="ORDER INFO"  collapsible="false" columns="2" dir="center" >  
+        <apex:pageBlockSectionItem >
+            <apex:outputText value="Child's Name:"/> 
+            <apex:outputText value="{!partnerOrder.Child_First_Name__c} {!partnerOrder.Child_Last_Name__c}"/>  
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputText value="Caregiver's Name:"/> 
+            <apex:outputText value="{!partnerOrder.Caregiver_s_First_name__c} {!partnerOrder.Caregiver_s_Last_name__c}"/>  
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputText value="Gender:"/> 
+            <apex:outputText value="{!partnerOrder.Child_Gender__c}"/>  
+        </apex:pageBlockSectionItem> 
+        <apex:pageBlockSectionItem >
+              <apex:outputText value="Who will pick up:"/> 
+              <apex:outputText value="{!partnerOrder.Who_will_pick_up__c}"/>  
+        </apex:pageBlockSectionItem> 
+        <apex:pageBlockSectionItem >
+             <apex:outputText value="Age:"/> 
+              <apex:outputText value="{!partnerOrder.Child_Age__c}"/>  
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+              <apex:outputText value="Phone:"/> 
+              <apex:outputText value="{!partnerOrder.Who_will_pick_up_phone__c}"/>  
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+            <apex:outputText value="Home Zip:"/> 
+            <apex:outputText value="{!partnerOrder.Child_Home_Zip_Code__c}"/>  
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >  </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >  </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >  </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+              <apex:outputText value="Emergency:"/> 
+              <apex:outputField value="{!partnerOrder.Emergency_Order__c}"  />
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+              <apex:outputText value="Emergency Type:"/> 
+              <apex:outputText value="{!partnerOrder.Emergency_Type__c}"/>  
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem >
+              <apex:outputText value="Emergency Reason:"/> 
+              <apex:outputText value="{!partnerOrder.Emergency_Reason__c}"/>  
+        </apex:pageBlockSectionItem> 
+        <apex:pageBlockSectionItem > 
+        </apex:pageBlockSectionItem>
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem> 
+        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem> 
+        <apex:pageBlockSectionItem >
+             <apex:outputText value="Child's Story:"/> 
+              <apex:outputText value="{!partnerOrder.Child_s_Story__c}"/>  
+        </apex:pageBlockSectionItem>
+         </apex:pageBlockSection> 
+    <apex:pageBlockSection columns="2" title="ITEMS" collapsible="false"> 
+    </apex:pageBlockSection>
+    <!--<apex:pageBlockTable id="tblItems" value="{!PartnerOrderItems}"   var="item" width="100%" > -->
+    <apex:pageBlockTable id="tblItems" value="{!PartnerOrderItems}"   var="item" width="100%" > 
+        <apex:column value="{!item.Item__c}" width="50%"/>
+       <apex:column value="{!item.Comment__c}" width="50%"/>
+        </apex:pageBlockTable>
+    <apex:pageBlockButtons location="bottom"> 
+        </apex:pageBlockButtons>
+    <center>
+    <div id="divbuttons" > 
+        <apex:commandButton id="btnBack" value="Back" action="{!reviewStepBack}"/>
+        <apex:commandButton id="btnSubmitNew" value="Submit & New"  action="{!submitNew}" onclick="return submitorder();" /> 
+        <apex:commandButton id="btnSubmit" value="Submit" action="{!submit}" onclick="return submitorder();"/> 
+    </div>
+    </center>
+</apex:pageBlock>
+    </div> 
+    </div>
+<!-----------------------------  MiddleEnd -------------------------------->
+<!-----------------------------  FotterStart -------------------------------->
+<div id="fotter">
+</div>
+<!-----------------------------  FotterEnd -------------------------------->
+</div>
+<!---------> 
+<div id="dialog-message" title="Error Message" Style="display:none;color: #FF0000;width:300px">
+    <p>
+        <span class="ui-icon ui-icon-circle-check" style="float: left; margin: 0 7px 50px 0;width:300px"></span>
+        <div id="divErrorMessage" style="width:300px;"></div>
+    </p> 
+</div> 
+</apex:form>
+</apex:page>

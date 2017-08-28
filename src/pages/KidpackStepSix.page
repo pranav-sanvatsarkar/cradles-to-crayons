@@ -1,0 +1,210 @@
+<apex:page controller="KidpackController" sidebar="false" standardStyleSheets="false" showHeader="false" action="{!redirectToLogin}">
+<meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <c:GlobalResources local="{!$CurrentPage.parameters.local}" Application_JS="common-controls.js,salesforce.js,error-manager.js,community-dashboard.js,application.js" Vendor_JS="datatables/jquery.dataTables.min.js,datatables/dataTables.responsive.js" Vendor_CSS="font-awesome/css/font-awesome.min.css,bootstrap/css/bootstrap.min.css,datatables/jquery.dataTables.css,datatables/responsive.dataTables.css,jquery/jquery-ui-custom.css" Application_CSS="application.css"/>
+	<head>
+    	<title>Kidpack</title>
+    	<style>
+    		.chkOrder{
+	    		margin-left: 3px !important;
+	    		vertical-align: inherit;
+            	float:right;
+    		}
+            @media screen and (max-width: 680px){
+table.responsive tbody td span.icon-expand {
+    display: inline-flex;
+    cursor: pointer;
+    color: #5b4c82;
+    border: solid 1px black;
+    height: 14px;
+    width: 14px;
+    color: white;
+    border: 2px solid white;
+    border-radius: 16px;
+    box-shadow: 0 0 1px #444;
+    box-sizing: content-box;
+    font-family: 'Courier New', Courier, monospace;
+    text-indent: 3px;
+    line-height: 14px;
+    background-color: #5b4c82;
+    margin-right: 5px;
+}}
+           
+        	.messageCell{
+            	width: 100%;
+            }
+                .messageCell h4{
+                    display:none;
+                }
+            	.messageText{
+            		color: red;
+            		padding-bottom: 5px;
+            	}
+    	</style>
+    	<script type="text/javascript">
+		       function toggleSideBar(){
+					if($(".app-sidebar").css('display') != 'none'){
+						$("#menuBttn").css("margin-left", "8px");
+						$(".app-sidebar").css("display", "none");
+					}
+					else{
+						$("#menuBttn").css("margin-left", "182px");
+						$(".app-sidebar").css({"position": "fixed", "top": 0, "bottom": 0, "display":"inline-block"});
+					}
+				}
+				function closeSideBar(){
+					$("#menuBttn").css("margin-left", "8px");
+					$(".app-sidebar").css("display", "none");
+				}
+				//Validation of input fields
+				$(document).ready(function(){ 
+					$(".parent-helper").parents("table").addClass("table");
+					$('body').on('click', '.icon-expand', function(){
+					   var $this = $(this);
+					   $this.parent('td').siblings().toggleClass('hidePhone');
+					   $this.toggleClass("expanded")
+				        if ($this.hasClass("expanded")) 
+				            $this.html("-");
+				        else 
+				            $this.html("+");
+					});
+                    for(var i=0;i<$('.chkOrder').length;i++){
+                        if($($('.chkOrder')[i]).prop("checked"))
+                           $($($($('.chkOrder')[i]).parent()[0]).children()[0]).click();
+                    }
+				});
+				function Errorpopup(msg){ 
+				        $("#dialog-message").text(msg);
+				        $("#dialog-message").dialog({
+			                 width:320,
+			                 modal: true,
+			                 draggable:false,
+			                 resizable:false,
+			                 buttons: {
+						                 Ok: function() {
+						                 		$(this).dialog("close");
+						                 }
+              				 },
+              				 open:function(event, ui){
+              				 	$('.ui-dialog-titlebar-close').hide();
+              				 	var btn = $('.ui-dialog-buttonpane').find('button')
+              				 	btn.addClass('btn btn-default');
+              				 	btn.css({'font-size':'12px'});
+              				 	
+              				 }
+				          });
+				        return false;
+			    }
+        		function manageSelect(chkBox){
+                	if(!($(chkBox).prop("checked")))
+                        getRelatedSelect(chkBox).val("--None--");
+                    $($($(chkBox).parent()[0]).children()[0]).click();
+                    return true;
+                }
+        		function getRelatedSelect(chk){
+                	return $($($(chk).parent().siblings()[0]).children()[0]);
+                }
+        		function getRelatedCheckbox(select){
+                	return $($($(select).parent().siblings()[0]).children()[2]);
+                }
+        		function manageCheckbox(select){
+                	if($(select).val()=="--None--"){
+                       getRelatedCheckbox(select).prop("checked",false);
+                    }else{
+                        getRelatedCheckbox(select).prop("checked",true);
+                    }
+                    return true;
+                }
+        		function validate(){  
+					$('.errText').remove();
+                    var validationFlag = true;
+				    for(var i=0;i<$('.chkOrder').length;i++){
+                    	if($($('.chkOrder')[i]).prop("checked") && getRelatedSelect($($('.chkOrder')[i])).val()=="--None--"){
+                        	InlineErrorMessegeField('Please Select Item.',getRelatedSelect($($('.chkOrder')[i])));
+                            validationFlag = false;
+                        }
+                    }
+                    if(!validationFlag){
+                        $($('.errText')[0]).prev().focus();
+                     }
+       				return validationFlag;
+    			}
+    	</script>
+    </head>
+    <body ng-app="dashboardApp" style="height:100%" ng-controller="dashboardCtrl">
+    	<div id="spinnerContainer"></div>
+    	<apex:form >
+	    	<div class="main-container">
+    			<c:TopHeader userName="{!userDetails.Name}"></c:TopHeader>
+                <apex:outputPanel id="sidebar" layout="block">
+					<c:SidebarComponent ></c:SidebarComponent>
+                </apex:outputPanel>
+				<apex:actionStatus id="ProcessingStatus" startStyleClass="imageloading" onstop="tablecss();initTooltip();">
+                       <apex:facet name="start">
+                           <apex:outputPanel >
+                               <center>
+                                   <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/LoadingImage.gif')}" style="top:calc(50% - 75px) ;left: calc(50% - 75px);position: absolute; width:150px; height:150px; "/>
+                               </center>
+                           </apex:outputPanel>
+                       </apex:facet>
+             	</apex:actionStatus>
+				<div class="container" id="applicationContainer"  style="padding-top:30px;padding-bottom:30px">
+					<!-- Progress tracker starts here -->
+					<div class="row">
+						<ol class="progress-tracker col-md-12 col-sm-12 col-xs-12">
+							  <li class="step col-md-2  col-sm-2 col-xs-2 col-md-offset-1" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2 " style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2 " style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2 active" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+						</ol>
+					</div>
+                    <div>
+                        <apex:pageMessages id="errorMessage" ></apex:pageMessages>
+                    </div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<span aria-hidden="true" class="fa fa-child"> </span> Kidpack - Baby Gear<span title=""></span>
+						</div>
+						<div class="panel-body">
+							<apex:pageBlock >
+						 		<apex:pageBlockTable styleClass="table responsive" id="tblItems" value="{!lstBabyGearItems}" var="babyGearItem" >
+									<apex:column >
+										<apex:outputPanel rendered="{!babyGearItem.ItemsBySubCategory != null}" styleClass="icon-expand">+ &nbsp;</apex:outputPanel>
+										<apex:outputLabel value="{!babyGearItem.Category}"></apex:outputLabel>
+										<apex:inputCheckbox styleClass="chkOrder" id="chkboxSelected" value="{!babyGearItem.IsSelected}" onchange="manageSelect(this)"/>
+									</apex:column>
+		
+									<apex:column styleClass="hidePhone">
+										<apex:selectList rendered="{!babyGearItem.ItemsBySubCategory != null}" styleClass="form-control" id="ddlType" multiselect="false" size="1"  value="{!babyGearItem.SelectedItemId}" onchange="manageCheckbox(this)">
+											<apex:selectOptions value="{!babyGearItem.ItemsBySubCategory}"></apex:selectOptions>
+										</apex:selectList>
+									</apex:column>
+									
+									<!-- <apex:column styleClass="hidePhone">
+										<apex:inputText id="txtComment" value="{!ItemsBySubCategory.Comment}" sstyleClass="form-control" />
+									</apex:column> -->
+								</apex:pageBlockTable>
+							</apex:pageBlock>
+					  	</div>
+					</div>	
+                    <apex:actionFunction action="{!saveStepSix}" name="saveStep6"> </apex:actionFunction>
+					<div class="row">
+                         <div class="col-md-4 col-sm-4 col-xs-12" style="margin-bottom:5px">
+					 		<input type="button" id="btnCancel" Class="btn btn-default btn-block" value="Cancel" onclick="getCancelSpeciality();"/>
+					 	</div>
+					 	<div class="col-md-4 col-sm-4 col-xs-12" style="margin-bottom:5px">
+					 		<apex:commandButton id="btnCancel" styleClass="btn btn-default btn-block" value="Back" action="{!Step6Back}" immediate="true"/>
+					 	</div>
+                        
+					 	<div class="col-md-4 col-sm-4 col-xs-12" style="margin-bottom:5px">
+						 		 <apex:commandButton id="btnSave" onclick="if(validate()){saveStep6()}return false;" value="Save & Next" styleClass="btn btn-default btn-block"  status="ProcessingStatus"  />  
+						</div>
+					</div>		
+				</div>
+				<div id="dialog-message" style="overflow: hidden;z-index: 999999;">
+           		</div>
+			</div>
+		</apex:form>
+    </body>
+</apex:page>

@@ -1,0 +1,145 @@
+<apex:page controller="PartnerOrderStep1Controller" sidebar="false" showchat="true" action="{!Redirect}" showheader="false">
+    <apex:stylesheet value="{!URLFOR($Resource.jquery, '/jquery/Style/css/smoothness/jquery-ui-1.9.0.custom.css')}" />
+    <apex:includescript value="{!URLFOR($Resource.jquery,'/jquery/Script/jquery-1.8.2.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.jquery,'/jquery/Script/jquery-ui-1.9.0.custom.js')}" />
+    <c:GlobalResources Local="{!$CurrentPage.parameters.local}" Application_CSS="PartnerOrder.css" Application_JS="ManageOrder.js"></c:GlobalResources>
+    <apex:form >
+        <div id="main">
+            <!-----------------------------  HeaderStart -------------------------------->
+            <div id="header">
+                <div id="divUserLogout">
+                    <apex:panelgrid columns="2">
+                        <apex:outputlabel value="{!userDetails.name}" />
+                        <apex:outputpanel >
+                            <div id="divhome">
+                                <apex:outputlink value="ManageOrder">
+                                    <apex:image id="btnhome1" title="Home" style="display:none;" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/home1.png')}" />
+                                    <apex:image id="btnhome2" title="Home" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/home2.png')}" />
+                                </apex:outputlink>
+                                <apex:outputlabel value="  " />
+                                <apex:outputlink value="/secur/logout.jsp">
+                                    <apex:image id="btnlogout1" title="Logout" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logout1.png')}" />
+                                    <apex:image id="btnlogout2" title="Logout" style="display:none;" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logout2.png')}" />
+                                </apex:outputlink>
+                            </div>
+                        </apex:outputpanel>
+                    </apex:panelgrid>
+                </div>
+                <div id="divlogo">
+                    <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logo.png')}" />
+                </div>
+            </div>
+            <!-----------------------------  HeaderEnd -------------------------------->
+            <!-----------------------------  MiddleStart -------------------------------->
+            <div id="side">
+                <b>S</b><br />
+                <b>I</b><br />
+                <b>D</b><br />
+                <b>E</b><br />
+                <b>B</b><br />
+                <b>A</b><br />
+                <b>R</b><br />
+            </div>
+            <div id="middle">
+                <div id="left" style="height:100%;">
+                    <c:SideBar orderlevel="{!OrderLevel}" usermessage="{!UserMessage}" sidebarheight="455px" enablecustomlinks="{!EnableCustomLinks}" enableorder="{!EnableOrder}" enablebulkorder="{!EnableBulkOrder}" />
+                </div>
+                <div id="divMiddle">
+                    <div id="sideButton">&#8249;</div>
+                </div>
+                <div id="right">
+                    <apex:pageblock >
+                        <apex:pageblockbuttons location="top">
+                        </apex:pageblockbuttons>
+                        <apex:pageblocksection title="REVIEW" collapsible="false" columns="1" dir="center">
+                            <apex:outputtext value="Please ensure the following information is correct, then click Submit at the end of the order." />
+                        </apex:pageblocksection>
+                        <apex:pageblocksection title="ORDER INFO" collapsible="false" columns="2" dir="center">
+                            <apex:pageblocksectionitem >
+                                <apex:outputtext value="Child's Name:" />
+                                <apex:outputtext value="{!partnerOrder.Child_First_Name__c} {!partnerOrder.Child_Last_Name__c}" />
+                            </apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem >
+                                <apex:outputtext value="Caregiver's Name:" />
+                                <apex:outputtext value="{!partnerOrder.Caregiver_s_First_name__c} {!partnerOrder.Caregiver_s_Last_name__c}" />
+                            </apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem >
+                                <apex:outputtext value="Gender:" />
+                                <apex:outputtext value="{!partnerOrder.Child_Gender__c}" />
+                            </apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem >
+                                <apex:outputtext value="Who will pick up:" />
+                                <apex:outputtext value="{!partnerOrder.Who_will_pick_up__c}" />
+                            </apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem >
+                                <apex:outputtext value="Age:" />
+                                <apex:outputtext value="{!partnerOrder.Child_Age__c}" />
+                            </apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem >
+                                <apex:outputtext value="Phone:" />
+                                <apex:outputtext value="{!partnerOrder.Who_will_pick_up_phone__c}" />
+                            </apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem >
+                                <apex:outputtext value="Home Zip:" />
+                                <apex:outputtext value="{!partnerOrder.Child_Home_Zip_Code__c}" />
+                            </apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem >  </apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem >  </apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem >  </apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem rendered="{!partnerOrder.Emergency_Order__c}" >
+                                <apex:outputtext value="Emergency:" />
+                                <apex:outputfield value="{!partnerOrder.Emergency_Order__c}" />
+                            </apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem rendered="{!partnerOrder.Emergency_Order__c}" >
+                                <apex:outputtext value="Emergency Type:" />
+                                <apex:outputtext value="{!partnerOrder.Emergency_Type__c}" />
+                            </apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem rendered="{!partnerOrder.Emergency_Order__c}" >
+                                <apex:outputtext value="Emergency Reason:" />
+                                <apex:outputtext value="{!partnerOrder.Emergency_Reason__c}" />
+                            </apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem >                            
+                            </apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem ></apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem ></apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem >
+                                <apex:outputtext value="Child's Story:" />
+                                <apex:outputtext value="{!partnerOrder.Child_s_Story__c}" />
+                            </apex:pageblocksectionitem>
+                            <apex:pageblocksectionitem >
+                                <apex:outputtext value="Order Status : " />
+                                <apex:outputtext value="{!PartnerOrderStatus}" />
+                            </apex:pageblocksectionitem>
+                        </apex:pageblocksection>
+                        <apex:pageblocksection columns="2" title="ITEMS" collapsible="false">
+                        </apex:pageblocksection>
+                        <apex:pageblocktable id="tblItems" value="{!PartnerOrderItemList2}" var="item" width="100%">
+                            <apex:column width="25%" value="{!item.Item__c}"  />
+                            <apex:column width="25%" value="{!item.Qty_Fulfilled__c}"  />
+                            <apex:column width="25%" value="{!item.Qty_Ordered__c}"  />
+                        </apex:pageblocktable>
+                        <apex:pageblockbuttons location="bottom">
+                        </apex:pageblockbuttons>
+                        <center>
+                            <div id="divbuttons">
+                                <apex:commandbutton id="btnBack" value="Back" action="https://inventory-cradlestocrayons.cs8.force.com/DistributionPartner/ManageOrder" />
+                            </div>
+                        </center>
+                    </apex:pageblock>
+                </div>
+            </div>
+            <!-----------------------------  MiddleEnd -------------------------------->
+            <!-----------------------------  FotterStart -------------------------------->
+            <div id="fotter">
+            </div>
+            <!-----------------------------  FotterEnd -------------------------------->
+        </div>
+        <!--------->
+        <div id="dialog-message" title="Error Message" style="display:none;color: #FF0000;width:300px">
+            <p>
+                <span class="ui-icon ui-icon-circle-check" style="float: left; margin: 0 7px 50px 0;width:300px"></span>
+            <div id="divErrorMessage" style="width:300px;"></div>
+            </p>
+        </div>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,132 @@
+<apex:page controller="CommunityDashboardController" showHeader="false" standardStylesheets="false" action="{!redirectToLogin}">
+    <meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <c:GlobalResources local="{!$CurrentPage.parameters.local}" Application_JS="common-controls.js,salesforce.js,error-manager.js,community-dashboard.js,application.js" Vendor_JS="datatables/jquery.dataTables.min.js,datatables/dataTables.responsive.js" Vendor_CSS="font-awesome/css/font-awesome.min.css,bootstrap/css/bootstrap.min.css,datatables/jquery.dataTables.css,datatables/responsive.dataTables.css" Application_CSS="application.css"/>
+    <head>
+        <title>Community Dashboard</title>
+    </head>
+    <body ng-app="dashboardApp" style="height:100%" ng-controller="dashboardCtrl">
+      
+        <apex:form >
+        <apex:actionFunction action="{!setComponent}" name="myFunction" rerender="manageComponent,sidebar" status="ProcessingStatus">
+                <apex:param name="cmpName" value=""/>
+                <apex:param name="cmpParams" value=""/>
+            </apex:actionFunction>
+            <div class="main-container">
+                  <c:TopHeader userName="{!userDetails.Name}"></c:TopHeader>
+                <apex:outputPanel id="sidebar" layout="block">
+                    <c:SidebarComponent currentComponent="CmmntyUsrPrflCmp"></c:SidebarComponent>
+                </apex:outputPanel>
+                <div class="container" id="applicationContainer"  style="padding-top:30px;padding-bottom:30px">
+                                            <style>
+                            .custom-row{
+                                padding:15px 0px
+                            }
+                            .profileheader{
+                                    margin: 15px;margin-left: -25px;
+                            }
+                            p.imageButtons{
+                                line-height: 120%;
+                                margin: 15px;
+                                font-size: 10px;
+                            }
+                            @media(max-width:460px){
+                                .profileheader{
+                                    margin-left: -25px;
+                                    margin-top: 15px;
+                                }
+                                h3{
+                                    font-size: 19px;
+                                }
+                            }
+                        </style>
+                        <div class="panel panel-default">
+                        <div class="panel-heading"><span aria-hidden="true" class="fa fa-user"> </span> User Details</div>
+                        <div class="panel-body" style="padding:30px">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="col-md-12">
+                                    <apex:image url="{!userDetails.FullPhotoUrl}" style="width:100%;"></apex:image>
+                                     <!-- the block below is the buttons allowing the user to change their profile image-->
+                                     <p class="imageButtons"><apex:pageMessages ></apex:pageMessages>
+                                     	<script>
+                                         	function selectImage()
+                                     		{
+                                     			$('[id$=file]').trigger('click');
+                                     		}
+                                         	function displayFilePath(element)
+                                         	{
+                                                $('[id$=filePath]').text('File: ' + element.files[0].name);
+                                                $('[id$=upldImg]').css('display','block');
+                                            }
+                                     	</script>
+                                         <apex:inputFile value="{!ProfileImg}" id="file" contentType="{!ContentType}" style="display:none;" onchange="displayFilePath(this);"/>
+                                         <label id="filePath" style="font-weight: normal; font-size: 12px;"></label>
+                                         <br/>
+                                         <input type="button" id="slctImg" value="Choose image to upload" onclick="selectImage();" class="btn btn-default btn-block no-corner-radii"/>
+                                         <br/>
+                                         <apex:commandButton action="{!upload}" id="upldImg" value="Upload image" styleClass="btn btn-default btn-block no-corner-radii" style="display:none;"/>
+                                     </p>
+                                     <!-- end profile image upload block-->
+
+                                </div>
+                                <div class="col-md-12">
+                                    <h3 style="text-align:center">
+                                    <apex:outputText value=" {0}  {1} ">
+                                        <apex:param value="{!userDetails.Contact.FirstName}"/>
+                                        <apex:param value="{!userDetails.Contact.LastName}"/>
+                                    </apex:outputText>
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="row col-md-6 col-sm-6 custom-row">
+                                    <div class="col-md-12" style="padding-top:0px"><label class="label-padding">Username  </label></div>
+                                    <div class="col-md-12"><apex:outputText value="{!userDetails.username}"/></div>
+                                </div>
+                                <div class="row col-md-6 col-sm-6 custom-row">
+                                    <div class="col-md-12" style="padding-top:0px"><label class="label-padding">Email  </label></div>
+                                    <div class="col-md-12"><apex:outputText value="{!userDetails.Email}"/></div>
+                                </div>
+                                <div class="row col-md-6 col-sm-6 custom-row">
+                                    <div class="col-md-12"><label class="label-padding">Organization Name  </label></div>
+                                    <div class="col-md-12"><apex:outputText value="{!userDetails.Contact.Account.Name}"/></div>
+                                </div>
+                                <div class="row col-md-6 col-sm-6 custom-row">
+                                    <div class="col-md-12"><label class="label-padding">Preferred Phone  </label></div>
+                                    <div class="col-md-12"><apex:outputText value="{!userDetails.Contact.npe01__PreferredPhone__c}"/></div>
+                                </div>
+                               <div class="row col-md-6 col-sm-6 custom-row">
+                                    <div class="col-md-12"><label class="label-padding">Mobile Phone  </label> </div>
+                                    <div class="col-md-12"><apex:outputText value="{!userDetails.Contact.MobilePhone}"/></div>
+                                </div>
+                                <div class="row col-md-6 col-sm-6 custom-row">
+                                    <div class="col-md-12"><label class="label-padding">Work Phone  </label></div>
+                                    <div class="col-md-12"><apex:outputText value="{!userDetails.Contact.npe01__WorkPhone__c}"/></div>
+                                </div>
+                                <div class="row col-md-6 col-sm-6 custom-row" style="padding-bottom: 30px;">
+                                    <div class="col-md-12"><label class="label-padding">Home Phone  </label></div>
+                                    <div class="col-md-12"><apex:outputText value="{!userDetails.Contact.HomePhone}"/></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="well" style="display: flex;">
+                                <apex:outputText style="font-weight:600;" value="{!portalConfiguration.ProfilePageMessage__c}" />
+                            </div>
+                        </div>
+          </div></div>             
+                </div>
+            </div>
+            <apex:actionStatus id="ProcessingStatus" startStyleClass="imageloading" onstop="tablecss();initTooltip();">
+                       <apex:facet name="start">
+                           <apex:outputPanel >
+                               <center>
+                                   <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/LoadingImage.gif')}" style="top:calc(50% - 75px) ;left: calc(50% - 75px);position: absolute; width:150px; height:150px; "/>
+                               </center>
+                           </apex:outputPanel>
+                       </apex:facet>
+             </apex:actionStatus>
+        </apex:form>
+    </body>
+   
+</apex:page>

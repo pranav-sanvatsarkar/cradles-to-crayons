@@ -1,0 +1,348 @@
+<apex:page controller="KidpackController" sidebar="false" standardStyleSheets="false" showHeader="false" action="{!redirectToLogin}">
+<meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <c:GlobalResources local="{!$CurrentPage.parameters.local}" Application_JS="common-controls.js,salesforce.js,error-manager.js,community-dashboard.js,application.js"  Vendor_CSS="font-awesome/css/font-awesome.min.css,bootstrap/css/bootstrap.min.css,jquery/jquery-ui-custom.css" Application_CSS="application.css"/>
+	<head>
+    	<title>Kidpack</title>
+        <style>
+            .ui-widget-content{
+            border:1px solid #aaaaaa;
+            }
+            select{
+            display:inline-block;
+            padding:0;
+            height:22px;
+            }
+            .ui-widget-header {
+            background: #8474b2;
+            }
+            .search { position: relative; }
+            .search input { text-indent: 30px;}
+            .search .fa-search { 
+            position: absolute;
+            top: 24px;
+            left: 7px;
+            font-size: 15px;
+            }
+            .chkOrder{
+            margin-left: 3px !important;
+            vertical-align: inherit;
+            float:right;
+            }
+            
+            .messageCell{
+            	width: 100%;
+            }
+                .messageCell h4{
+                    display:none;
+                }
+            	.messageText{
+            		color: red;
+            		padding-bottom: 5px;
+            	}
+        </style>
+        <script type="text/javascript">
+        $(document).ready(function(){
+            //Added Code
+            if($('input[id$=txtBirthdate]').val() != ''){
+                $('input[id$=chkboxBirthdayGift]').prop("checked",true);   
+            }
+            $(".parent-helper").parents("table").addClass("table");
+            //Code for responsiveness
+            $('body').on('click', 'span.icon-expand', function(){
+                var $this = $(this);
+                $this.parent('td').siblings().toggleClass('hidePhone');
+                $this.toggleClass("expanded")
+                if ($this.hasClass("expanded")) 
+                    $this.html("-");
+                else 
+                    $this.html("+");
+            });
+            for(var i=0;i<$('.chkOrder').length;i++){
+                if($($('.chkOrder')[i]).prop("checked"))
+                    $($($($('.chkOrder')[i]).parent()[0]).children()[0]).click();
+            }
+            $(".parent-helper").parents("table").addClass("table");
+            $('input[id$=txtBirthdate]').datepicker({ 
+                dateFormat: 'mm/dd/yy', 
+                changeMonth: true,
+                changeYear: true ,
+                onSelect: function(dateText, inst) { 
+                    var date = $(this).datepicker('getDate'),
+                        day  = date.getDate(),  
+                        month = date.getMonth() + 1,              
+                        year =  date.getFullYear();
+                    $('.ui-datepicker-trigger').ready(function(){
+                        if($('input[id$=txtBirthdate]').val()!=''){ 
+                            $('input[id$=txtBirthdayGiftComment]').show();
+                        } 
+                        else 
+                            $('input[id$=txtBirthdayGiftComment]').hide();  
+                    });
+                }
+            });
+            //$(".ui-datepicker-trigger").addClass("fa fa-calender")
+            $('.ui-datepicker-trigger').addClass('fa fa-calendar');
+            $('.ui-datepicker-trigger').removeAttr("src alt title");
+            $('.ui-datepicker-trigger').attr("id","dateMarker");
+            $('.ui-datepicker-trigger').css({'float': 'left','margin-left':'4px','height':'31px','font-size':'28px','color':'#612d9c'});
+            
+        });
+        function toggleSideBar(){
+            if($(".app-sidebar").css('display') != 'none'){
+                $("#menuBttn").css("margin-left", "8px");
+                $(".app-sidebar").css("display", "none");
+            }
+            else{
+                $("#menuBttn").css("margin-left", "182px");
+                $(".app-sidebar").css({"position": "fixed", "top": 0, "bottom": 0, "display":"inline-block"});
+            }
+        }
+        function closeSideBar(){
+            $("#menuBttn").css("margin-left", "8px");
+            $(".app-sidebar").css("display", "none");
+        }
+        //Validation of input fields
+        //$(document).ready(function(){ 
+        //			$(".parent-helper").parents("table").addClass("table");
+        //Code for responsiveness
+        //			$('body').on('click', 'span.icon-expand', function(){
+        //			   var $this = $(this);
+        //			   $this.parent('td').siblings().toggleClass('hidePhone');
+        //			   $this.toggleClass("expanded")
+        //		        if ($this.hasClass("expanded")) 
+        //		            $this.html("-");
+        //		        else 
+        //		            $this.html("+");
+        //			});
+        //          for(var i=0;i<$('.chkOrder').length;i++){
+        //              if($($('.chkOrder')[i]).prop("checked"))
+        //                  $($($($('.chkOrder')[i]).parent()[0]).children()[0]).click();
+        //          }
+        //		});
+        function Errorpopup(msg){ 
+            $("#dialog-message").text(msg);
+            $("#dialog-message").dialog({
+                width:320,
+                modal: true,
+                draggable:false,
+                resizable:false,
+                buttons: {
+                    Ok: function() {
+                        $(this).dialog("close");
+                    }
+                },
+                open:function(event, ui){
+                    $('.ui-dialog-titlebar-close').hide();
+                    var btn = $('.ui-dialog-buttonpane').find('button')
+                    btn.addClass('btn btn-default');
+                    btn.css({'font-size':'12px'});
+                    
+                }
+            });
+            return false;
+        }
+        function dateDiffInYears(dateold, datenew){
+            var ynew = datenew.getFullYear();
+            var mnew = datenew.getMonth();
+            var dnew = datenew.getDate();
+            var yold = dateold.getFullYear();
+            var mold = dateold.getMonth();
+            var dold = dateold.getDate();
+            var diff = ynew - yold;
+            if (mold > mnew) diff--;
+            else{
+                if (mold == mnew){
+                    if (dold > dnew) diff--;
+                }
+            }
+            return diff;
+        } 
+        function checkdate(input){
+            var arrInput = input.split("/");
+            if(arrInput.length==3 && (arrInput[0].length==2 || arrInput[0].length==1) && (arrInput[1].length==2 || arrInput[1].length==1) && arrInput[2].length==4){
+                if(!isNaN(parseInt(arrInput[0])) && !isNaN(parseInt(arrInput[1])) && !isNaN(parseInt(arrInput[2]))){
+                    if(parseInt(arrInput[0])<=12 && parseInt(arrInput[0])>0 && parseInt(arrInput[1])>0 && parseInt(arrInput[2])>0){
+                        var arrMonth = [31,28,31,30,31,30,31,31,30,31,30,31];
+                        var arrLeapMonth = [31,29,31,30,31,30,31,31,30,31,30,31];
+                        if(parseInt(arrInput[2])%4==0){
+                            if(parseInt(arrInput[1])<=arrLeapMonth[parseInt(arrInput[0])-1])
+                                return true;
+                            else
+                                return false
+                                }else{
+                                    if(parseInt(arrInput[1])<=arrMonth[parseInt(arrInput[0])-1])
+                                        return true;
+                                    else
+                                        return false
+                                        }
+                    }else{
+                        return false;
+                    }
+                    
+                }else{
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        }
+        function manageSelect(chkBox){
+            if(!($(chkBox).prop("checked")))
+                getRelatedSelect(chkBox).val("--None--");
+            $($($(chkBox).parent()[0]).children()[0]).click();
+            return true;
+        }
+        function getRelatedSelect(chk){
+            return $($($(chk).parent().siblings()[0]).children()[0]);
+        }
+        function getRelatedCheckbox(select){
+            return $($($(select).parent().siblings()[0]).children()[2]);
+        }
+        function manageCheckbox(select){
+            if($(select).val()=="--None--"){
+                getRelatedCheckbox(select).prop("checked",false);
+            }else{
+                getRelatedCheckbox(select).prop("checked",true);
+            }
+            return true;
+        }
+        function validate(){  
+            $('.errText').remove();
+            var validationFlag = true;
+            for(var i=0;i<$('.chkOrder').length;i++){
+                if($($('.chkOrder')[i]).prop("checked") && getRelatedSelect($($('.chkOrder')[i])).val()=="--None--"){
+                    InlineErrorMessegeField('Please Select Item.',getRelatedSelect($($('.chkOrder')[i])));
+                    validationFlag = false;
+                }
+            }
+            if($('input[id$=txtBirthdate]').val() != ''){
+                //var validformat=/^\d{2}\/\d{2}\/\d{4}$/;
+                if(!checkdate($('input[id$=txtBirthdate]').val())){
+                    
+                    InlineErrorMessege('Please enter valid birthdate.','#dateMarker');
+                    validationFlag = false;
+                }else{
+                    var currdate = new Date();
+                    var olddate1 =  new Date(1989, 05, 03, 0, 0, 0,0);
+                    var old = $('input[id$=txtBirthdate]').val();
+                    old = old.split('/');
+                    var olddate = new Date(old[2], old[1], old[0], 0, 0, 0,0);
+                    var diffInYears = dateDiffInYears(olddate, currdate);
+                    if(diffInYears > 12){
+                        InlineErrorMessege('Birthdate should not be greater than 12 years.','#dateMarker');
+                        validationFlag = false;
+                    }
+                    
+                }
+            }else{
+                if ($('input[id$=chkboxBirthdayGift]').prop("checked")){  
+                    if($('input[id$=txtBirthdate]').val() == ''){
+                        InlineErrorMessege('Please Enter Child Birth Date','#dateMarker');
+                        validationFlag = false;
+                    }
+                    else if($('input[id$=txtBirthdate]').val() != ''){
+                        var currdate = new Date();
+                        var olddate1 =  new Date(1989, 05, 03, 0, 0, 0,0);
+                        var old = $('input[id$=txtBirthdate]').val();
+                        old = old.split('/');
+                        var olddate = new Date(old[2], old[1], old[0], 0, 0, 0,0);
+                        var diffInYears = dateDiffInYears(olddate, currdate);
+                        if(diffInYears > 12){
+                            InlineErrorMessege('Birthdate should not be greater than 12 years.','#dateMarker');
+                            validationFlag = false;
+                        }
+                    }
+                }
+            }
+            if(!validationFlag){
+                $($('.errText')[0]).prev().focus();
+            }
+            return validationFlag;
+        }
+        </script>
+    </head>
+    <body ng-app="dashboardApp" style="height:100%" ng-controller="dashboardCtrl">
+    	<div id="spinnerContainer"></div>
+        <apex:form >
+            <div class="main-container">
+                <c:TopHeader userName="{!userDetails.Name}"></c:TopHeader>
+                <apex:outputPanel id="sidebar" layout="block">
+                    <c:SidebarComponent ></c:SidebarComponent>
+                </apex:outputPanel>
+                <apex:actionStatus id="ProcessingStatus" startStyleClass="imageloading" onstop="tablecss();initTooltip();">
+                    <apex:facet name="start">
+                        <apex:outputPanel >
+                            <center>
+                                <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/LoadingImage.gif')}" style="top:calc(50% - 75px) ;left: calc(50% - 75px);position: absolute; width:150px; height:150px; "/>
+                            </center>
+                        </apex:outputPanel>
+                    </apex:facet>
+                </apex:actionStatus>
+                <div class="container" id="applicationContainer"  style="padding-top:30px;padding-bottom:30px">
+                    <!-- Progress tracker starts here -->
+                    <div class="row">
+                        <ol class="progress-tracker col-md-12 col-sm-12 col-xs-12">
+                            <li class="step col-md-2  col-sm-2 col-xs-2 col-md-offset-1" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+                            <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+                            <li class="step col-md-2 col-sm-2 col-xs-2 " style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+                            <li class="step col-md-2 col-sm-2 col-xs-2 active" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+                            <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+                            <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+                        </ol>
+                    </div>
+                    <div>
+                        <apex:pageMessages id="errorMessage" ></apex:pageMessages>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <span aria-hidden="true" class="fa fa-child"> </span> Kidpack - Item based selection
+                        </div>
+                        <div class="panel-body">
+                            <apex:pageBlock >
+                                <apex:pageBlockTable styleClass="table responsive" value="{!lstStandardItems}" var="standardItem" style="margin-bottom:0px;" >
+                                    <apex:column >
+                                        <span class="icon-expand">+</span> &nbsp;<apex:outputLabel value="{!standardItem.Category}"></apex:outputLabel>
+                                        <apex:inputCheckbox id="chkboxSelected" styleClass="chkOrder" value="{!standardItem.IsSelected}" onchange="manageSelect(this)"/>
+                                    </apex:column>
+                                    <apex:column styleClass="hidePhone">
+                                        <apex:selectList styleClass="form-control" id="ddlType" multiselect="false" size="1"  value="{!standardItem.SelectedItemId}" onchange="manageCheckbox(this)">
+                                            <apex:selectOptions value="{!standardItem.ItemsByCategory}"></apex:selectOptions>
+                                        </apex:selectList>
+                                    </apex:column>
+                                    <apex:column styleClass="hidePhone">
+                                        <apex:inputText id="txtComment" value="{!standardItem.Comment}" maxlength="250" styleClass="form-control" html-placeholder="Please add comments here." />
+                                    </apex:column>
+                                </apex:pageBlockTable>
+                                <apex:pageBlockTable styleClass="table responsive" id="tblItems" value="{!partnerOrder}" var="partnerOrder">     
+                                    <apex:column >
+                                        <apex:outputLabel value="Date of Birth"><span style="margin-right:25px;margin-bottom:0px;"></span></apex:outputLabel>
+                                    </apex:column>
+                                    <apex:column style="margin-top:0px;">
+                                        <apex:inputField html-placeholder="mm/dd/yyyy" id="txtBirthdate" value="{!partnerOrder.Child_Birthdate__c}" styleClass="form-control" showDatePicker="false" /><i id="dateMarker" class="fa fa-calendar" style="margin-top: -22px;float: right;margin-right: 5px;"></i>
+                                    </apex:column>
+                                    <apex:column >
+                                        <apex:outputLabel value="Birthday Gift ?"></apex:outputLabel>&nbsp;
+                                        <apex:inputCheckbox styleClass="chkOrder" id="chkboxBirthdayGift" value="{!IsBirthdayItem}"/>
+                                    </apex:column>
+                                </apex:pageBlockTable>
+                            </apex:pageBlock>
+                        </div>
+                    </div>
+                    <apex:actionFunction action="{!saveStepFour}" name="saveStep4"> </apex:actionFunction>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4 col-xs-12" style="margin-bottom:5px">
+                            <input type="button" id="btnCancel" Class="btn btn-default btn-block" value="Cancel" onclick="getCancelSpeciality();"/>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-12" style="margin-bottom:5px">
+                            <apex:commandButton id="btnCancel" styleClass="btn btn-default btn-block" value="Back" action="{!Step4Back}" immediate="true"/>
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-12" style="margin-bottom:5px">
+                            <apex:commandButton id="btnSave" onclick="if(validate()){saveStep4();}return false;" value="Save & Next" styleClass="btn btn-default btn-block"  status="ProcessingStatus"  />  
+                        </div>
+                    </div>
+                    <div id="dialog-message" style="overflow: hidden;z-index: 999999;"> </div>
+                </div>
+            </div>
+        </apex:form>
+    </body>
+</apex:page>

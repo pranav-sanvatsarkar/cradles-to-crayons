@@ -1,0 +1,197 @@
+<apex:page controller="KidpackController" sidebar="false" standardStyleSheets="false" showHeader="false" action="{!redirectToLogin}">
+<meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <c:GlobalResources local="{!$CurrentPage.parameters.local}" Application_JS="common-controls.js,salesforce.js,error-manager.js,community-dashboard.js,application.js" Vendor_JS="datatables/jquery.dataTables.min.js,datatables/dataTables.responsive.js" Vendor_CSS="font-awesome/css/font-awesome.min.css,bootstrap/css/bootstrap.min.css,datatables/jquery.dataTables.css,datatables/responsive.dataTables.css,jquery/jquery-ui-custom.css" Application_CSS="application.css"/>
+	<head>
+    	<title>Kidpack</title>
+        <style >
+        	.messageCell{
+            	width: 100%;
+            }
+                .messageCell h4{
+                    display:none;
+                }
+            	.messageText{
+            		color: red;
+            		padding-bottom: 5px;
+            	}
+        </style>
+    	<script type="text/javascript">
+		       function toggleSideBar(){
+					if($(".app-sidebar").css('display') != 'none'){
+						$("#menuBttn").css("margin-left", "8px");
+						$(".app-sidebar").css("display", "none");
+					}
+					else{
+						$("#menuBttn").css("margin-left", "182px");
+						$(".app-sidebar").css({"position": "fixed", "top": 0, "bottom": 0, "display":"inline-block"});
+					}
+				}
+				function closeSideBar(){
+					$("#menuBttn").css("margin-left", "8px");
+					$(".app-sidebar").css("display", "none");
+				}
+				//Validation of input fields
+				$(document).ready(function(){ 
+					$(".parent-helper").parents("table").addClass("table");
+					var ddEmergencyType = $('select[id$=ddlEmergencyType]');
+					var txtReason = $('textarea[id$=txtReason]');
+					if ($('input[id$=chkboxEmergencyOrder]').prop('checked') == true){
+					    txtReason.removeAttr('disabled');
+					    ddEmergencyType.removeAttr('disabled');
+                        //ddEmergencyType.attr("required","true");
+                        //txtReason.attr("required","true");             
+				    } 
+				  	else{ 
+			  		  	txtReason.val('');
+                        //ddEmergencyType.attr("required","false");
+                        //txtReason.attr("required","false");
+				      	ddEmergencyType.attr('disabled' , 'disabled');
+				      	txtReason.attr('disabled' , 'disabled');
+				  	}
+				  
+					$('input[id$=chkboxEmergencyOrder]').change(function(){
+						$('.errText').remove();  
+                        if($(this).prop('checked') == true){
+						          txtReason.removeAttr('disabled');
+						          ddEmergencyType.removeAttr('disabled');
+                            //ddEmergencyType.attr("required","required");
+                            //txtReason.attr("required","required");             
+						  } 
+						  else{      
+							      txtReason.val('');
+							      ddEmergencyType.val('');
+                              //ddEmergencyType.removeAttr("required");
+                              // txtReason.removeAttr("required");
+							      ddEmergencyType.attr('disabled' , 'disabled');
+							      txtReason.attr('disabled' , 'disabled');
+						  }
+					});
+				});
+				function Errorpopup(msg){ 
+				        $("#dialog-message").text(msg);
+				        $("#dialog-message").dialog({
+			                 width:320,
+			                 modal: true,
+			                 draggable:false,
+			                 resizable:false,
+			                 buttons: {
+						                 Ok: function() {
+						                 		$(this).dialog("close");
+						                 }
+              				 },
+              				 open:function(event, ui){
+              				 	$('.ui-dialog-titlebar-close').hide();
+              				 	var btn = $('.ui-dialog-buttonpane').find('button')
+              				 	btn.addClass('btn btn-default');
+              				 	btn.css({'font-size':'12px'});
+              				 	
+              				 }
+				          });
+				        return false;
+			    }    
+				function validate(e){  
+				    $('.errText').remove();
+                    if($('input[id$=chkboxEmergencyOrder]').prop("checked")){
+						if(($('textarea[id$=txtReason]').val().length)== 0 && ($('select[id$=ddlEmergencyType]').val() == "" || $('select[id$=ddlEmergencyType]').val() == "--None--")){ 
+			  				InlineErrorMessege('Please enter Emergency Type.','select[id$=ddlEmergencyType]');
+                            $($('.errText')[0]).prev().focus();
+			  				return false;               
+	    				}
+						else if($('select[id$=ddlEmergencyType]').val() == 'Other Reason (include below)') {
+                            if(($('textarea[id$=txtReason]').val().length) == 0 ){
+	            				InlineErrorMessege('Please enter Reason.','textarea[id$=txtReason]');
+                                $($('.errText')[0]).prev().focus();
+	            				return false;
+                            }
+       					}
+       				    return true;
+					}
+					return true;
+    			}
+    	</script>
+    	
+    </head>
+    <body ng-app="dashboardApp" style="height:100%" ng-controller="dashboardCtrl">
+    	<div id="spinnerContainer"></div>
+    	<apex:form >
+	    	<div class="main-container">
+    			<c:TopHeader userName="{!userDetails.Name}"></c:TopHeader>
+                <apex:outputPanel id="sidebar" layout="block">
+					<c:SidebarComponent ></c:SidebarComponent>
+                </apex:outputPanel>
+				<apex:actionStatus id="ProcessingStatus" startStyleClass="imageloading" onstop="tablecss();initTooltip();">
+                       <apex:facet name="start">
+                           <apex:outputPanel >
+                               <center>
+                                   <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/LoadingImage.gif')}" style="top:calc(50% - 75px) ;left: calc(50% - 75px);position: absolute; width:150px; height:150px; "/>
+                               </center>
+                           </apex:outputPanel>
+                       </apex:facet>
+             	</apex:actionStatus>
+				<div class="container" id="applicationContainer"  style="padding-top:30px;padding-bottom:30px">
+					<!-- Progress tracker starts here -->
+					<div class="row">
+						<ol class="progress-tracker col-md-12 col-sm-12 col-xs-12">
+							  <li class="step col-md-2  col-sm-2 col-xs-2 col-md-offset-1" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2 active" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+						</ol>
+					</div>
+                    <div>
+                        <apex:pageMessages id="errorMessage" ></apex:pageMessages>
+                    </div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<span aria-hidden="true" class="fa fa-child"> </span> Kidpack - Emergency Order <span rel="tooltip" title="An Emergency Order is intended for a child who has NOTHING and/or has lost EVERYTHING (fire, flood, etc.). If the family/child circumstance does not fit this criteria the order is not eligible for emergency status and we ask that you place a standard KidPack order by skipping this step." class="fa fa-exclamation-circle"></span>
+						</div>
+						<div class="panel-body">
+					 		<div class="row custom-row">
+								<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+									<apex:outputLabel value="Emergency Order "/> <span rel="tooltip" title="{!$ObjectType.Partner_Order__c.fields.Emergency_Order__c.inlineHelpText}" class="fa fa-question-circle"></span>
+								</div>
+								<div class="col-md-9 col-sm-6 col-xs-12 top-padding">
+                                	<apex:inputCheckbox id="chkboxEmergencyOrder" value="{!partnerOrder.Emergency_Order__c}"/>
+                                </div>
+							</div>
+							<div class="row custom-row">
+								<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+									<apex:outputLabel value="Emergency Type "/> <span rel="tooltip" title="{!$ObjectType.Partner_Order__c.fields.Emergency_Type__c.inlineHelpText}" class="fa fa-question-circle"></span>
+								</div>
+								<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+                                	<apex:inputField id="ddlEmergencyType" label="" value="{!partnerOrder.Emergency_Type__c}" styleClass="form-control" required="false" />
+                                </div>
+							</div>
+							<div class="row custom-row">
+								<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+									<apex:outputLabel value=" Reason"/>
+								</div>
+								<div class="col-md-9 col-sm-6 col-xs-12 top-padding">
+									<apex:inputTextarea html-placeholder="Please specify your reason for emergency." id="txtReason"  style="resize:vertical;height:auto!important"  styleClass="form-control" value="{!partnerOrder.Emergency_Reason__c}" required="false" onblur="this.value=this.value.trim()" />
+								</div>
+							</div>
+						</div>
+					</div>	
+					<apex:actionFunction action="{!saveStepThree}" name="saveStepThree"> </apex:actionFunction>
+					<div class="row">
+                         <div class="col-md-4 col-sm-4 col-xs-12" style="margin-bottom:5px">
+					 		<input type="button" id="btnCancel" Class="btn btn-default btn-block" value="Cancel" onclick="getCancelSpeciality();"/>
+					 	</div>
+					 	<div class="col-md-4 col-sm-4 col-xs-12" style="margin-bottom:5px">
+					 		<apex:commandButton id="btnCancel" styleClass="btn btn-default btn-block" value="Back" action="{!Step3Back}"/>
+					 	</div>
+                        
+					 	<div class="col-md-4 col-sm-4 col-xs-12" style="margin-bottom:5px">
+					 		 <apex:commandButton id="btnSave" value="Save & Next" styleClass="btn btn-default btn-block" onclick="if(validate()){saveStepThree();}return false;" status="ProcessingStatus" />  
+					 	</div>
+					 </div>
+				</div>
+				<div id="dialog-message" style="overflow: hidden;z-index: 999999;">
+           		</div>
+			</div>
+			
+		</apex:form>
+    </body>
+</apex:page>

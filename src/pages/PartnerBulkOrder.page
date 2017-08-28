@@ -1,0 +1,359 @@
+<apex:page controller="PartnerBulkOrder" sidebar="false" showheader="false" action="{!Redirect}">
+    <apex:stylesheet value="{!URLFOR($Resource.jquery, '/jquery/Style/css/smoothness/jquery-ui-1.9.0.custom.css')}" />
+    <apex:includescript value="{!URLFOR($Resource.jquery,'/jquery/Script/jquery-1.8.2.js')}" />
+    <apex:includescript value="{!URLFOR($Resource.jquery,'/jquery/Script/jquery-ui-1.9.0.custom.js')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.jquery, '/jquery/Style/css/PartnerOrder.css')}" />
+    <style type="text/css">
+        .col1 {
+            width: 40%;
+            text-align: center;
+        }
+
+        .col2 {
+            width: 40%;
+            text-align: center;
+        }
+
+        .col3 {
+            width: 20%;
+            text-align: center;
+        }
+
+        th {
+            text-align: center;
+        }
+    </style>
+    <script type="text/javascript">
+        var flag = 'True';
+        $(document).ready(function(){
+            $("#divTabs").tabs() ;
+            $("#btnGroup").buttonset();
+            $("#divpagination").buttonset();
+            $('.bPageBlock ').css('border-top','1px solid white');
+            $('input[id$=txtBirthdate]').val('');
+            tablecss();
+            $("#divMiddle").click(function(){
+                $("#left").hide('drop',100);
+                $("#divMiddle").hide('drop',100);
+                $("#right").css('width','100%');
+                $("#side").css('opacity','1');
+            }).mouseover(function(){
+                $("#divMiddle").css("background-color","#D2E9FF");
+            }).mouseout(function(){
+                $("#divMiddle").css("background-color","white");
+
+            });
+
+            $("#side").click(function(){
+                $("#left").show('drop',100);
+                $("#divMiddle").show('drop',100);
+                $("#right").css('width','83%');
+                $("#side").css('opacity','0');
+            });
+            $('.ui-state-active').css({color:'#8344F5',border:'2px solid #8344F5'});
+
+            $('input[id$=btnBack]').removeClass().addClass('btnSubmitandNew');
+            $('input[id$=btnSubmitNew]').removeClass().addClass('btnSubmitandNew');
+            $('input[id$=btnSubmit]').removeClass().addClass('btnSubmitandNew');
+
+            $('img[id$=btnhome1]').hide();
+            $('img[id$=btnhome2]').mouseover(function(){
+                $('img[id$=btnhome2]').hide();$('img[id$=btnhome1]').show();
+            });
+            $('img[id$=btnhome1]').mouseout(function(){
+                $('img[id$=btnhome2]').show();$('img[id$=btnhome1]').hide();
+            });
+            $('img[id$=btnlogout2]').hide();
+            $('img[id$=btnlogout1]').mouseover(function(){
+                $('img[id$=btnlogout1]').hide();$('img[id$=btnlogout2]').show();
+            });
+            $('img[id$=btnlogout2]').mouseout(function(){
+                $('img[id$=btnlogout1]').show();$('img[id$=btnlogout2]').hide();
+            });
+
+        });
+
+
+        function tablecss()
+        {$('[id$="myBlock"]').removeClass('bPageBlock');
+            $("#divpagination").buttonset();
+
+        }
+
+        var msg;
+        function validate(e)
+        {
+            var len = $('select[id$=ddlBulkItemType]').length;
+            var itemcount =0;
+
+
+            for( var i=0; i <len; i++){
+                if($($('select[id$=ddlBulkItemType]')[i]).val()!='')
+                { itemcount =1;
+                    if($($('select[id$=ddlSelectedItem]')[i]).val()=='--None--')
+                    {
+
+                        msg = 'Please Select Item.';
+                        Errorpopup();
+                        return false;
+                    }
+                    else
+                        if ($($('input[id$=txtQuantity]')[i]).val()<=1)
+                        {
+                            msg = 'Quantity should greater than 1.';
+                            Errorpopup();
+                            return false;
+                        }
+                }
+            }
+            if( itemcount == 0 )
+            {
+                msg = 'Please Select Item.';
+                Errorpopup();
+                return false;
+
+            }
+            /*if( $('input[id$=txtLocation]').val()=='')
+                {
+                    msg = 'Please Enter Your Location.';
+                    Errorpopup();
+                    return false;
+                } */
+            if($('input[id$=txtWhoWillPickName]').val()=='')
+            {
+                msg = 'Please Enter Who Will Pick Name.';
+                Errorpopup();
+                return false;
+            }
+            if($('input[id$=txtPickupEmail]').val()=='')
+            {
+
+                msg = 'Please Enter Pick Email.';
+                Errorpopup();
+                return false;
+            }
+            else{
+                pattern = /^\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i ;
+                if( !pattern.test($('input[id$=txtPickupEmail]').val()) )
+                {
+                    msg = 'Email is incorrect.';
+                    Errorpopup();
+                    return false;
+                }
+            }
+            if($('input[id$=txtPickupPhone]').val()=='' )
+            {
+                msg = 'Please Enter Pick Phone.';
+                Errorpopup();
+                return false;
+            }
+
+            if (!$('input[id$=chkboxTermsAgree1]').prop("checked")|| !$('input[id$=chkboxTermsAgree2]').prop("checked"))
+            {
+                msg = 'Please make sure you are agree with terms and conditions.';
+                Errorpopup();
+                return false;
+            }
+
+            return true;
+        }
+
+
+        function Errorpopup()
+        {
+            $( "#dialog-message").text(msg);
+            $( "#dialog-message").dialog({
+                width:320,
+                modal: true,
+                buttons: {
+                    Ok: function() {
+                        $( this ).dialog( "close" );
+                    } }});
+        }
+        var strMessage = "At this time, we are not accepting new orders.";
+        function Errorpop()
+        {
+
+            $( "#dialog-message").text(strMessage);
+            $( "#dialog-message").dialog({
+                width:320,
+                modal: true,
+                buttons: {
+                    Ok: function() {
+                        $( this ).dialog( "close" );
+
+                    } }});
+            return false;
+        }
+        function submitorder()
+        {
+            if( validate() )
+            {
+                if( {!portalConfiguration.EnableBulkOrder__c} )
+                 return true;
+                else
+                {
+                 return Errorpop();
+            }
+        }
+        else
+       return false;
+        }
+    </script>
+
+    <apex:form >
+        <apex:outputpanel >
+            <apex:actionstatus id="ProcessingStatus">
+                <apex:facet name="start">
+                    <apex:outputpanel >
+                        <center>
+                            <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/LoadingImage.gif')}" style="top:40% ;position: absolute; width:100px; height:100px; " />
+                        </center>
+                    </apex:outputpanel>
+                </apex:facet>
+            </apex:actionstatus>
+            <div id="main">
+                <!-----------------------------  HeaderStart -------------------------------->
+                <div id="header">
+                    <div id="divUserLogout">
+
+                        <apex:panelgrid columns="2">
+                            <apex:outputlabel value="{!userDetails.name}" />
+                            <apex:outputpanel >
+                                <div id="divhome">
+                                    <apex:outputlink value="ManageOrder">
+                                        <apex:image id="btnhome1" title="Home" style="display:none;" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/home1.png')}" />
+                                        <apex:image id="btnhome2" title="Home" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/home2.png')}" />
+                                    </apex:outputlink>
+                                    <apex:outputlabel value="  " />
+                                    <apex:outputlink value="/secur/logout.jsp">
+                                        <apex:image id="btnlogout1" title="Logout" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logout1.png')}" />
+                                        <apex:image id="btnlogout2" title="Logout" style="display:none;" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logout2.png')}" />
+                                    </apex:outputlink>
+                                </div>
+                            </apex:outputpanel>
+                        </apex:panelgrid>
+                    </div>
+                    <div id="divlogo">
+                        <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logo.png')}" />
+                    </div>
+                </div>
+                <!-----------------------------  HeaderEnd -------------------------------->
+                <!-----------------------------  MiddleStart -------------------------------->
+                <div id="side">
+                    <b>S</b><br />
+                    <b>I</b><br />
+                    <b>D</b><br />
+                    <b>E</b><br />
+
+                    <b>B</b><br />
+                    <b>A</b><br />
+                    <b>R</b><br />
+
+                </div>
+                <div id="middle">
+                    <div id="left" style="height:100%;">
+                        <c:SideBar orderlevel="{!OrderLevel}" usermessage="{!UserMessage}" sidebarheight="455px" enablecustomlinks="{!EnableCustomLinks}" enableorder="{!EnableOrder}" enablebulkorder="{!EnableBulkOrder}" />
+
+                    </div>
+                    <div id="divMiddle">
+                        <div id="sideButton">
+                            &#8249;
+                        </div>
+
+                    </div>
+                    <div id="right" style="height:100%">
+                        <apex:pageblock >
+                            <apex:outputtext value="  " /><br />
+                            <apex:pageblocksection title="Available Specialty Items" collapsible="false" columns="1" dir="center">
+                                <apex:outputtext value="While KidPacks are individually tailored for specific children, Specialty Items are different. Specialty Items are distributed in large quantities (i.e. 55 gallon bags, boxes, cases, etc). Specialty Items are quality checked prior to distribution. Please select from the available Specialty Items below. (Do not see an item you were hoping to order? This item is not available for order at this time.) " />
+                            </apex:pageblocksection>
+                        </apex:pageblock>
+
+                        <apex:pageblock >
+                            <apex:pageblocktable id="tblItems" value="{!PartnerWrapper}" var="partnerItems" columnclasses="col1,col2,col3" captionstyle="text-align:center">
+                                <apex:column >
+                                    <apex:facet name="header">
+                                        <apex:outputlabel value="Type"></apex:outputlabel>
+                                    </apex:facet>
+                                    <apex:inputfield id="ddlBulkItemType" value="{!partnerItems.ItemBulkType.Bulk_Type__c}" onchange="FillItems('{!partnerItems.Index}')" styleclass="selectItems">
+                                    </apex:inputfield>
+                                </apex:column>
+
+                                <apex:column >
+                                    <apex:facet name="header">
+                                        <apex:outputlabel value="Item"></apex:outputlabel>
+                                    </apex:facet>
+                                    <apex:selectlist id="ddlSelectedItem" value="{!partnerItems.SelectedItemId}" multiselect="false" size="1" styleclass="selectItems">
+                                        <apex:selectoptions value="{!partnerItems.BulkTypeItems}"></apex:selectoptions>
+                                    </apex:selectlist>
+                                </apex:column>
+                                <apex:column >
+                                    <apex:facet name="header">
+                                        <apex:outputlabel value="Quantity"></apex:outputlabel>
+                                    </apex:facet>
+                                    <apex:inputtext id="txtQuantity" value="{!partnerItems.Quantity}" style="width:30px;" />
+                                </apex:column>
+                            </apex:pageblocktable>
+
+                            <apex:actionfunction name="FillItems" action="{!FillList}" rerender="tblItems" status="ProcessingStatus">
+                                <apex:param name="firstParam" assignto="{!SelectedIndex}" value="" />
+                            </apex:actionfunction>
+                            <br />
+                            <apex:commandbutton value="Add More" action="{!AddRows}" rerender="tblItems" status="ProcessingStatus" />
+                            <br /><br />
+                            <apex:pageblocksection title="Pickup & Distribution Information" collapsible="false">
+                                <apex:inputfield id="txtWhoWillPickName" value="{!partnerOrder.Who_will_pick_up__c}" required="true" />
+                                <apex:inputfield id="txtPickupEmail" value="{!partnerOrder.Partner_Email__c}" required="true" />
+                                <apex:inputfield id="txtPickupPhone" value="{!partnerOrder.Who_will_pick_up_phone__c }" required="true" />
+                                <!-- <apex:outputLabel ></apex:outputLabel>-->
+                                <apex:pageblocksectionitem >
+                                    <span class="Custom ToolTip text">
+                                        Location <img src="/s.gif" alt="Help" class="helpIcon" title="{!$ObjectType.Partner_Order__c.fields.Location__c.inlineHelpText}" />
+                                    </span>
+                                    <apex:inputfield id="txtLocation" value="{!partnerOrder.Location__c }" required="false" />
+                                </apex:pageblocksectionitem>
+
+                                <apex:inputfield value="{!partnerOrder.PickUpDay__c}" />
+                                <apex:inputfield value="{!partnerOrder.Pick_up_Hours__c}" />
+
+                            </apex:pageblocksection>
+                            <apex:pageblocksection columns="1" collapsible="false">
+                                <apex:outputlabel value="Please take a moment to share with us the impact that receiving these items will have on a particular family you serve." style="padding-left: 80px;" />
+                                <apex:inputtextarea id="txtChildStory" style="width: 597px;height: 103px;max-width: 500px;margin: 0px;max-height: 100px;margin-left: 2%;" value="{!partnerOrder.Child_s_Story__c}" />
+                            </apex:pageblocksection>
+                            <apex:pageblocksection columns="1" title="Terms & Conditions" collapsible="false">
+
+                                <apex:outputpanel ><apex:inputcheckbox id="chkboxTermsAgree1" />We thank you for your specialty item order. Due to overwhelming demand, Cradles to Crayons does not guarantee fulfillment of your request. (You will be notified by a C2C representative of any changes made to your request, unless otherwise stated.) By checking this box, you agree to these terms.</apex:outputpanel>
+                                <apex:outputpanel ><apex:inputcheckbox id="chkboxTermsAgree2" /><apex:outputtext value="Cradles to Crayons remains dedicated to serving children in need. Those families who do not fit income eligibility of experiencing low-income (200% FPL) and/or homelessness are not eligible to receive items from Cradles to Crayons. I agree to these terms." /></apex:outputpanel>
+                            </apex:pageblocksection>
+
+                            <center>
+                                <div id="divbuttons">
+                                    <apex:commandbutton id="btnBack" value="Cancel" action="{!cancel}" />
+                                    <apex:commandbutton id="btnSubmitNew" value="Submit & New" action="{!submitnew}" onclick="return submitorder();" />
+                                    <apex:commandbutton id="btnSubmit" value="Submit" action="{!submit}" onclick="return submitorder();" />
+                                </div>
+                            </center>
+
+                        </apex:pageblock>
+                    </div>
+                </div>
+                <!-----------------------------  MiddleEnd -------------------------------->
+                <!-----------------------------  FotterStart -------------------------------->
+                <div id="fotter">
+
+                </div>
+                <!-----------------------------  FotterEnd -------------------------------->
+            </div>
+            <!--------->
+            <div id="dialog-message" title="Error Message" style="display:none;color: #FF0000;">
+                <p>
+                    <span class="ui-icon ui-icon-circle-check" style="float: left; margin: 0 7px 50px 0;"></span>
+                    <div id="divErrorMessage"></div>
+                </p>
+
+            </div>
+        </apex:outputpanel>
+    </apex:form>
+</apex:page>

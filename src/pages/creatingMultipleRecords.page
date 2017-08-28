@@ -1,0 +1,317 @@
+<apex:page controller="creatingMultipleRecordsController" tabStyle="Volunteer_Visit__c">
+<apex:pageMessages ></apex:pageMessages>
+    <script type="text/javascript">
+    
+        var previousOnload = window.onload;        
+        window.onload = function() 
+        { 
+            if (previousOnload) 
+            { 
+                previousOnload();
+            } 
+            
+            document.getElementById("valueOfXdiv").style.display = "none";
+            document.getElementById("monthlyDetaildiv").style.display = "none";
+            //document.getElementById("endDateDiv").style.display = "none";
+            document.getElementById("occurencesDiv").style.display = "none";
+            //document.getElementById("{!$Component.formid.hdnFldForScheduler}").value = "endDate";
+            
+            
+        }
+    </script>
+
+
+<apex:form id="formid">
+  
+  <apex:inputHidden id="hdnFld" value="{!hdnValue}"/>
+  <apex:inputHidden id="hdnFldForScheduler" value="{!hdnValueForScheduler}"/>
+  
+  <apex:pageBlock >
+  
+  <apex:pageblocksection id="secOne" columns="1" title="Volunteer Visit Details">
+    
+    
+     
+    <apex:pageblockSectionItem >  
+       <apex:outputLabel value="Volunteer Visit Name:"/>
+       <apex:outputField value="{!volvisit.Name}"/>
+       
+    </apex:pageblocksectionItem>  
+  
+    <apex:pageblockSectionItem >  
+       <apex:outputLabel value="Scheduled Start Date:"/>
+       <apex:outputText value="{!schStartDate}"/>
+    </apex:pageblocksectionItem>
+    
+    <apex:pageblockSectionItem > 
+       <apex:outputLabel value="Start Time:"/>
+       <apex:outputPanel layout="block" styleClass="requiredInput">
+         <apex:outputPanel styleClass="requiredBlock"/>
+          <apex:selectList value="{!startTime}" size="1" id="category1">
+              <apex:selectOptions value="{!categoriesStart}"/>
+          </apex:selectList>
+       </apex:outputPanel>
+       
+    </apex:pageblocksectionItem>
+    
+       
+    <apex:pageblockSectionItem >
+       <apex:outputLabel value="Duration:"/>
+       <apex:outputPanel layout="block" styleClass="requiredInput">
+         <apex:outputPanel styleClass="requiredBlock"/>
+           <apex:inputText value="{!duration}"/>
+           <apex:outputLabel value="in minutes"/>
+           <!--<apex:selectList value="{!endTime}" size="1" id="category2">
+               <apex:selectOptions value="{!categoriesEnd}"/>
+           </apex:selectList>-->
+       </apex:outputPanel>
+    </apex:pageblocksectionItem>
+     
+    
+    <br/>
+    
+  </apex:pageblocksection>
+  
+ 
+  
+   
+    
+    
+      
+     <apex:pageBlockSection id="secRepeat" columns="1" title="Recurrence Details"> 
+     
+      
+       
+      <apex:pageBlockSectionItem >
+         
+         <apex:outputPanel >
+           <apex:outputLabel value="Repeat Type"></apex:outputLabel>
+         </apex:outputPanel>   
+         
+         <apex:panelGrid columns="2">
+             <div id="weeklyRadiodiv">
+               <input type="radio" id="weeklyRadio" name="Repeat" value="Weekly" onclick="showRelevantData(this)" CHECKED="true"/> Weekly
+             </div> 
+         </apex:panelGrid> 
+         
+       
+      </apex:pageBlockSectionItem>
+       
+      <apex:pageBlockSectionItem >
+      
+      <apex:outputPanel />
+      
+      <apex:panelGrid columns="2">
+         <apex:outputPanel id="pnlOne">
+            <div id="everyRadiodiv">
+               <input type="radio" id="everyRadio" name="Repeat" value="EveryXWeek" onclick="showRelevantData(this)"/> Every X Week
+            </div>
+          </apex:outputPanel> 
+         
+         
+         <apex:outputPanel id="pnlTwo">
+            <div id="valueOfXdiv">
+               <apex:outputLabel id="lblValueOfX" value="Value Of X:    "/> 
+               <apex:inputText id="txtxValue" value="{!xvalue}"/>
+            </div>
+          </apex:outputPanel> 
+       </apex:panelGrid>
+          
+       </apex:pageBlockSectionItem> 
+       
+       <apex:pageBlockSectionItem >    
+       
+       <apex:outputPanel />
+       
+       <apex:panelGrid columns="2">
+          
+          <apex:outputPanel id="pnlThree">
+            <div id="monthlyRadiodiv">
+              <input type="radio" id="monthlyRadio" name="Repeat" value="Monthly" onclick="showRelevantData(this)"/> Monthly 
+            </div>
+          </apex:outputPanel> 
+        
+          <apex:outputPanel >
+              <div id="monthlyDetaildiv">
+                  <apex:panelGrid columns="1">
+                      
+                       <apex:outputLabel value="Pattern:"/>  
+                       
+                       <apex:outputPanel >
+                           <apex:selectRadio value="{!selectionPattern}" >
+                             <apex:selectOptions value="{!ItemsPattern}"/>
+                           </apex:selectRadio>
+                      </apex:outputPanel>
+                  
+                  </apex:panelGrid> 
+              </div>
+          </apex:outputPanel>
+       </apex:panelGrid> 
+             
+       </apex:pageBlockSectionItem> 
+  
+    
+    
+      <apex:pageBlockSectionItem >
+     
+        <apex:outputLabel value="Day:"/>  
+        <apex:outputPanel >
+            <apex:selectRadio value="{!selectionDay}">
+               <apex:selectOptions value="{!itemsDay}"/>
+            </apex:selectRadio>
+        </apex:outputPanel>
+     
+      </apex:pageBlockSectionItem>
+      
+      <apex:pageBlockSectionItem >
+        <apex:outputLabel value="Start Date:"/> 
+        <apex:outputPanel layout="block" styleClass="requiredInput">
+           <apex:outputPanel styleClass="requiredBlock"/>
+           <apex:inputField value="{!tempTaskStart.ActivityDate}" required="false"/>
+        </apex:outputPanel>
+      </apex:pageBlockSectionItem>
+    
+     <apex:pageBlockSectionItem >
+         
+         <apex:outputPanel >
+           <apex:outputLabel value="Schedule By:"></apex:outputLabel>
+         </apex:outputPanel>   
+         
+         <apex:outputPanel />
+         
+       
+      </apex:pageBlockSectionItem>
+       
+      <apex:pageBlockSectionItem >
+      
+        <apex:outputPanel />
+        <apex:outputPanel >
+         
+          <apex:panelGrid columns="2">
+             <apex:outputPanel >
+                  <input type="radio" id="endDateRadio" name="scheduleBy" value="endDate" onclick="showRelevantData(this)" checked="true"/> End Date
+             </apex:outputPanel> 
+             
+            
+             <apex:outputPanel layout="block" styleClass="requiredInput">
+              <apex:outputPanel styleClass="requiredBlock"/>
+                <div id="endDateDiv">
+                   <apex:inputField id="endDateFld" value="{!tempTaskEnd.ActivityDate}"/>
+                </div>
+              </apex:outputPanel> 
+           </apex:panelGrid>
+         </apex:outputPanel>     
+       </apex:pageBlockSectionItem> 
+       
+      <apex:pageBlockSectionItem >
+      
+        <apex:outputPanel />
+        <apex:outputPanel >
+          <apex:panelGrid columns="2">
+             <apex:outputPanel >
+                  <input type="radio" id="occurencesRadio" name="scheduleBy" value="occurences" onclick="showRelevantData(this)"/> Occurrences
+             </apex:outputPanel> 
+             
+            
+             <apex:outputPanel layout="block" styleClass="requiredInput">
+               <apex:outputPanel styleClass="requiredBlock"/>
+                <div id="occurencesDiv">
+                    <apex:inputText value="{!occurences}"/>
+                </div>
+              </apex:outputPanel> 
+           </apex:panelGrid>
+         </apex:outputPanel>     
+       </apex:pageBlockSectionItem> 
+     
+      <apex:pageBlockSectionItem >
+      
+         <apex:outputPanel >   
+           <apex:inputCheckbox value="{!copy}" title="Copy Volunteer Registrations"/>
+           <apex:outputLabel value="Copy Volunteer Registrations"/>
+         </apex:outputPanel>   
+          
+       </apex:pageBlockSectionItem>  
+     
+     <!-- <apex:pageBlockSectionItem > 
+        <apex:outputLabel value="Number of Occurences:"/>  
+        <apex:outputPanel layout="block" styleClass="requiredInput">
+          <apex:outputPanel styleClass="requiredBlock"/>
+          <apex:inputText value="{!occurences}"/>
+        </apex:outputPanel>
+      </apex:pageBlockSectionItem>-->
+      
+     
+       
+ </apex:pageBlockSection>
+     
+ 
+    
+  <div id="divButton">
+   
+   <apex:pageBlockButtons >
+      <apex:commandButton value="Create Visits" action="{!send}"/>
+      <apex:commandButton value="Cancel" action="{!bnCancel}"/>
+    </apex:pageBlockButtons>
+    
+  </div>
+  
+   
+   
+  </apex:pageblock>
+   
+ </apex:form>
+ 
+  <script type="text/javascript">
+  
+  function showRelevantData(selectedRadio)
+  {
+    
+      if(selectedRadio.value=="Weekly")
+      {
+        
+        document.getElementById("{!$Component.formid.hdnFld}").value = "Weekly";
+        document.getElementById("valueOfXdiv").style.display = "none";
+        document.getElementById("monthlyDetaildiv").style.display = "none";
+            
+                
+      }
+      if(selectedRadio.value=="EveryXWeek")
+      {
+        document.getElementById("{!$Component.formid.hdnFld}").value = "everyXWeek";
+        document.getElementById("valueOfXdiv").style.display = "block";
+        document.getElementById("monthlyDetaildiv").style.display = "none";
+           
+      }
+      if(selectedRadio.value=="Monthly")
+      {
+        document.getElementById("{!$Component.formid.hdnFld}").value = "Monthly";
+       
+        
+        document.getElementById("valueOfXdiv").style.display = "none";
+        document.getElementById("monthlyDetaildiv").style.display = "block";
+          
+      }
+      if(selectedRadio.value=="endDate")
+      {
+        document.getElementById("{!$Component.formid.hdnFldForScheduler}").value = "endDate";
+       
+        
+        document.getElementById("occurencesDiv").style.display = "none";
+        document.getElementById("endDateDiv").style.display = "block";
+          
+      }
+      if(selectedRadio.value=="occurences")
+      {
+        document.getElementById("{!$Component.formid.hdnFldForScheduler}").value = "occurences";
+       
+        
+        document.getElementById("endDateDiv").style.display = "none";
+        document.getElementById("occurencesDiv").style.display = "block";
+          
+      }
+  }
+  
+      
+  </script>
+               
+</apex:page>

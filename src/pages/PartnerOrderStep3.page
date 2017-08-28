@@ -1,0 +1,534 @@
+<apex:page controller="PartnerOrderStep1Controller" sidebar="false"     showHeader="false"  action="{!Redirect}">
+      <apex:stylesheet value="{!URLFOR($Resource.jquery, '/jquery/Style/css/smoothness/jquery-ui-1.9.0.custom.css')}"/>
+   <apex:includeScript value="{!URLFOR($Resource.jquery,'/jquery/Script/jquery-1.8.2.js')}" /> 
+<apex:includeScript value="{!URLFOR($Resource.jquery,'/jquery/Script/jquery-ui-1.9.0.custom.js')}" />
+      <apex:stylesheet value="{!URLFOR($Resource.jquery, '/jquery/Style/css/PartnerOrder.css')}"/> 
+   
+    <script type="text/javascript">
+ var flag='True';
+    function HideComments()
+    {   
+        
+        
+       $('select[id$=ddlCarSear]').change(function(){if($('select[id$=ddlCarSear]').val()!='--None--'){ $('input[id$=txtCarSearItemComment]').show();} else $('input[id$=txtCarSearItemComment]').hide();});
+       $('select[id$=ddlStroller]').change(function(){if($('select[id$=ddlStroller]').val()!='--None--'){ $('input[id$=txtStrollerItemComment]').show();} else $('input[id$=txtStrollerItemComment]').hide();});
+       $('select[id$=ddlTemp]').change(function(){if($('select[id$=ddlTemp]').val()!='--None--'){ $('input[id$=txtTempItemComment]').show();} else $('input[id$=txtTempItemComment]').hide();});   
+        
+       
+       $('select[id$=ddlCarSear]').ready(function(){if($('select[id$=ddlCarSear]').val()!='--None--'){ $('input[id$=txtCarSearItemComment]').show();} else $('input[id$=txtCarSearItemComment]').hide();});
+       $('select[id$=ddlStroller]').ready(function(){if($('select[id$=ddlStroller]').val()!='--None--'){ $('input[id$=txtStrollerItemComment]').show();} else $('input[id$=txtStrollerItemComment]').hide();});
+       $('select[id$=ddlTemp]').ready(function(){if($('select[id$=ddlTemp]').val()!='--None--'){ $('input[id$=txtTempItemComment]').show();} else $('input[id$=txtTempItemComment]').hide();});
+        
+    }
+    function NurseryItemsComments()
+    {
+        $($('table[id$=tblNurseryItems] tr td')[0]).css('width','400px');
+       $($('table[id$=tblNurseryItems] tr td')[1]).css('width','400px');
+        $($('table[id$=tblNurseryItems] tr td')[2]).css('min-width','200px');
+     $('table[id$=tblNurseryItems] tr td:first-child').css('text-align', 'right');
+     var i = 0;
+    var NurseryItemslength = $('select[id$=ddlNursery]').length;
+     for( ; i < NurseryItemslength; i++)
+     {
+         if($($('select[id$=ddlNursery]')[i]).val()!='--None--'){$($('input[id$=txtNurseryItemComment]')[i]).show();}else {$($('input[id$=txtNurseryItemComment]')[i]).hide();}      
+     }
+     
+     
+        
+    }
+$(document).ready(function(){ 
+    noBack();
+    HideComments();
+    NurseryItemsComments();
+  
+    var iIndex = 0 ;
+    var NurseryItemslength = $('select[id$=ddlNursery]').length;
+    for(  ; iIndex < NurseryItemslength; iIndex++)
+    {
+         if($($('select[id$=ddlNursery]')[iIndex]).val()=='--None--')
+         {
+            $($('input[id$=chkboxNursery]')[iIndex]).attr('checked',false); 
+         }  
+         
+    }
+    
+    $($('table[id$=tblPartnerItems] tr td')[0]).css('width','400px');
+    $($('table[id$=tblPartnerItems] tr td')[1]).css('width','400px');
+    $($('table[id$=tblPartnerItems] tr td')[2]).css('min-width','200px');
+     
+    $($('table[id$=tblNurseryItems] tr td')[0]).css('width','400px');
+    $($('table[id$=tblNurseryItems] tr td')[1]).css('width','400px');
+    $($('table[id$=tblNurseryItems] tr td')[2]).css('min-width','200px');
+   
+     $('table[id$=tblPartnerItems] tr td:first-child').css('text-align', 'right');
+     $('table[id$=tblNurseryItems] tr td:first-child').css('text-align', 'right');
+    
+    $("#divTabs").tabs() ;
+    $("#btnGroup").buttonset();    
+    $("#divpagination").buttonset();
+   $('.bPageBlock ').css('border-top','1px solid white');                           
+    $('input[id$=txtBirthdate]').val('');
+     tablecss(); 
+    
+    $("#divMiddle").click(function(){
+       $("#left").hide('drop',100);
+       $("#divMiddle").hide('drop',100);
+       $("#right").css('width','100%');
+        $("#side").css('opacity','1');
+    }).mouseover(function(){
+        $("#divMiddle").css("background-color","#D2E9FF"); 
+    }).mouseout(function(){
+        $("#divMiddle").css("background-color","white");  
+        
+    });
+    
+    $("#side").click(function(){
+       $("#left").show('drop',100);
+       $("#divMiddle").show('drop',100);
+       $("#right").css('width','83%');
+        $("#side").css('opacity','0');
+    });
+      
+ 
+
+if($('select[id$=ddlCarSear]').val()!='--None--') 
+    $('input[id$=chkboxCarSear]').prop("checked","true");
+if($('select[id$=ddlStroller]').val()!='--None--') 
+    $('input[id$=chkboxStroller]').prop("checked","true"); 
+if($('select[id$=ddlTemp]').val()!='--None--') 
+    $('input[id$=chkboxTemp]').prop("checked","true"); 
+
+ 
+ 
+    $(".ui-state-default").css('border','solid 1px #9874da');
+    $('.ui-state-active').css({color:'#8344F5',border:'2px solid #8344F5'});  
+    $('input[id$=btnBack]').removeClass().addClass('btnSubmit');  
+    $('input[id$=btnSave]').removeClass().addClass('btnSubmit');  
+    $("#right").height($("#left").height()+17+'px');
+    $("#divMiddle").height($("#left").height()+17+'px');
+      $('img[id$=btnhome1]').hide();
+    $('img[id$=btnhome2]').mouseover(function(){
+    $('img[id$=btnhome2]').hide();$('img[id$=btnhome1]').show(); 
+    });
+     $('img[id$=btnhome1]').mouseout(function(){
+     $('img[id$=btnhome2]').show();$('img[id$=btnhome1]').hide();
+    }); 
+    $('img[id$=btnlogout2]').hide();
+    $('img[id$=btnlogout1]').mouseover(function(){
+    $('img[id$=btnlogout1]').hide();$('img[id$=btnlogout2]').show();
+    });
+    $('img[id$=btnlogout2]').mouseout(function(){
+    $('img[id$=btnlogout1]').show();$('img[id$=btnlogout2]').hide();
+    });  
+    $('input[id$=txtNurseryItemComment]').on('blur',function(){validatecomments();}); 
+    
+    $('input[id$=txtCarSearItemComment]').on('blur',function(){validatecomments();}); 
+   
+   
+    $('input[id$=txtStrollerItemComment]').on('blur',function(){validatecomments();});
+    $('input[id$=txtTempItemComment]').on('blur',function(){validatecomments();}); 
+});
+ 
+     
+ function tablecss()
+{$('[id$="myBlock"]').removeClass('bPageBlock');
+    $("#divpagination").buttonset();
+     
+} 
+        var msg;
+ function validate(e)
+{ 
+    
+    var len= $('select[id$=ddlNursery]').length;
+    
+    for( var i=0; i <len; i++){ 
+        if ($($('input[id$=chkboxNursery]')[i]).prop("checked"))
+          if($($('select[id$=ddlNursery]')[i]).val()!='')
+        { 
+            if($($('select[id$=ddlNursery]')[i]).val()=='--None--')
+            {
+                 
+                msg='Please Select Item.';
+                Errorpopup();
+                return false;    
+            }
+                
+                
+            }
+        
+        if($($('select[id$=ddlNursery]')[i]).val()!='--None--') 
+        {
+             if (!$($('input[id$=chkboxNursery]')[i]).prop("checked"))
+            { msg=' Please check the box to add to your order.';
+                       Errorpopup();
+                       return false; 
+            }
+        }
+        
+        
+         }
+       
+    
+     if ($('input[id$=chkboxNursery]').prop("checked"))
+        {    if ($('select[id$=ddlNursery]').val()=='--None--') 
+                {
+                    msg='Please Select Item.'
+                       Errorpopup();
+                       return false;
+                } 
+        }
+      if ($('select[id$=ddlNursery]').val()!='--None--') 
+        {
+            if (!$('input[id$=chkboxNursery]').prop("checked"))
+            { msg=' Please check the box to add to your order.';
+                       Errorpopup();
+                       return false; 
+            }
+        }
+         
+    
+    if ($('input[id$=chkboxCarSear]').prop("checked"))
+        {    if ($('select[id$=ddlCarSear]').val()=='--None--') 
+                {
+                    msg='Please Select Item.'
+                       Errorpopup();
+                       return false;
+                } 
+        }
+        
+      if ($('input[id$=chkboxStroller]').prop("checked"))
+      {    if ($('select[id$=ddlStroller]').val()=='--None--') 
+              {
+                  msg='Please Select Item.'
+                     Errorpopup();
+                     return false;
+              } 
+      }
+      if ($('input[id$=chkboxTemp]').prop("checked"))
+      {    if ($('select[id$=ddlTemp]').val()=='--None--') 
+              {
+                  msg='Please Select Item.'
+                     Errorpopup();
+                     return false;
+              } 
+      }
+    if ($('select[id$=ddlCarSear]').val()!='--None--') 
+    {
+        if (!$('input[id$=chkboxCarSear]').prop("checked"))
+        { msg=' Please check the box to add to your order.';
+                   Errorpopup();
+                   return false; 
+        }
+    }
+    if ($('select[id$=ddlStroller]').val()!='--None--') 
+        {
+            if (!$('input[id$=chkboxStroller]').prop("checked"))
+            { msg=' Please check the box to add to your order.';
+                       Errorpopup();
+                       return false; 
+            }
+        }
+        if ($('select[id$=ddlTemp]').val()!='--None--') 
+        {
+            if (!$('input[id$=chkboxTemp]').prop("checked"))
+            { msg=' Please check the box to add to your order.';
+                       Errorpopup();
+                       return false; 
+            }
+        }
+   
+   
+    
+       
+        if( validatecomments() != true)
+        return false;
+      return true;
+ }       
+    function validatecomments()
+    {
+    msg='Comments should be less than 250 characters.'; 
+    
+    if($('input[id$=txtNurseryItemComment]').val().length>249)
+    {
+         Errorpopup();
+        $('#dialog-message').width('670px');
+        return false;
+    }
+       
+    else if($('input[id$=txtCarSearItemComment]').val().length>249)
+     {
+        Errorpopup();
+        $('#dialog-message').width('670px');
+        return false;
+    } 
+    else if($('input[id$=txtStrollerItemComment]').val().length>249)
+     {
+        Errorpopup();
+        $('#dialog-message').width('670px');
+        return false;
+    }
+     else if($('input[id$=txtTempItemComment]').val().length>249)
+     {
+        Errorpopup();
+        $('#dialog-message').width('670px');
+        return false;
+    } 
+   
+
+    return true;
+
+    }
+        
+   
+    function Errorpopup()
+    {
+        $( "#dialog-message").text(msg);
+        $( "#dialog-message").dialog({
+                width:320,
+                 modal: true,
+                buttons: {
+                Ok: function() {
+                $( this ).dialog( "close" );
+                 } }});
+    }  
+  function noenter(ev)  { 
+if (ev.which == "13") {
+    $('input[id$=btnBack]').prop('disabled', true);
+    $('input[id$=btnSave]').click(function(){ $('input[id$=btnBack]').prop('disabled', false);}); 
+    }  
+    }  
+    window.history.forward();
+        function noBack()
+        {
+            window.history.forward();
+        }  
+    </script>
+  <apex:form >
+ <div id="main">
+<!-----------------------------  HeaderStart -------------------------------->
+    <div id="header">
+     <div id="divUserLogout" >  
+        <apex:panelGrid columns="2"> 
+      <apex:outputLabel value="{!userDetails.name}"/>
+         <apex:outputPanel >
+    <div id="divhome"> 
+        <apex:outputLink value="ManageOrder" >
+        <apex:image id="btnhome1" title="Home" style="display:none;" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/home1.png')}"      />
+        <apex:image id="btnhome2" title="Home"   value="{!URLFOR($Resource.jquery,'/jquery/Style/images/home2.png')}"  /></apex:outputLink>
+        <apex:outputLabel value="  "/> 
+        <apex:outputLink value="/secur/logout.jsp">
+        <apex:image id="btnlogout1" title="Logout" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logout1.png')}"      />
+        <apex:image id="btnlogout2" title="Logout" style="display:none;" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logout2.png')}"  /></apex:outputLink>
+    </div>
+             </apex:outputPanel>
+  </apex:panelGrid>
+        </div>
+         <div id="divlogo" >
+    <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/logo.png')}"   />
+        </div>
+    </div>
+<!-----------------------------  HeaderEnd -------------------------------->
+<!-----------------------------  MiddleStart -------------------------------->
+     
+     <div id="side"  >
+         <b>S</b><br/>
+         <b>I</b><br/>
+         <b>D</b><br/>
+         <b>E</b><br/>
+         
+         <b>B</b><br/>
+         <b>A</b><br/>
+         <b>R</b><br/>
+         
+     </div>
+     
+    <div id="middle">
+        <div id="left" style="height:100%;"> 
+       <c:SideBar orderLevel="{!OrderLevel}"  userMessage="{!UserMessage}" SideBarHeight="455px" EnableCustomLinks="{!EnableCustomLinks}" EnableOrder="{!EnableOrder}" EnableBulkOrder="{!EnableBulkOrder}"/>
+        </div>
+        <div id="divMiddle"  >
+            <div id="sideButton" >
+                &#8249;
+            </div>
+        </div>
+        <div id="right">
+               <apex:pageBlock >
+                   <apex:pageBlockButtons location="top"> 
+        <div id="btnGroup"  >
+            <input type="radio" id="Step1" name="radio"  disabled="True" /><label for="Step1">Step 1</label>
+            <input type="radio" id="Step2" name="radio"   disabled="True"/><label for="Step2">Step 2</label>
+            <input type="radio" id="Step3" name="radio" checked="checked" disabled="False" /><label for="Step3">Step 3</label>
+            <input type="radio" id="StepReview" name="radio" disabled="True"/><label for="StepReview" >Review</label>
+        </div>
+          </apex:pageBlockButtons>
+                
+     <apex:pageBlockSection title="BABY GEAR" collapsible="false" > 
+     </apex:pageBlockSection>
+     <br/>
+    <apex:outputText value="Please note that Baby Gear items are one of the most difficult items for Cradles to Crayons to provide children with out of stock rates at or above 75%. We do encourage you to request these items in the chance we are able to provide them, while also encouraging you to seek alternative avenues for attaining these items for this child. We are continuing to work hard to fill these important gaps for the families you serve. If you know of sustainable resources that could help Cradles to Crayons better fill this annual gap for families, please reach out to your Cradles to Crayons representative."/> 
+        <br/>   <br/>   
+    <apex:panelGrid id="tblPartnerItems" cellpadding="1" cellspacing="10"  columns="3" width="100%"   style="text-align: center;margin-left: -5%;" > 
+        <apex:outputLabel value="Add to Order"/> 
+        <apex:outputLabel value="Select Appropriate Item(s)"/> 
+       <!--  <apex:outputLabel value="Comments"/>--> 
+        <apex:outputLabel value=""/>
+        
+        <apex:outputPanel >
+        <apex:outputLabel value="Car Seat"/> 
+        <apex:inputCheckbox id="chkboxCarSear" value="{!IsAddItem[10]}"/> 
+        </apex:outputPanel> 
+        <apex:selectList id="ddlCarSear" multiselect="false"  size="1"  value="{!CarSearItemId}" styleClass="selectItems"><apex:selectOptions value="{!CarSearItems}"> </apex:selectOptions></apex:selectList>
+       <!--   <apex:inputText id="txtCarSearItemComment" value="{!CarSearItemComment}" onkeypress=" noenter(event);"/> -->
+       <apex:outputLabel value=""/>
+        
+        <apex:outputPanel >
+        <apex:outputLabel value="Stroller"/> 
+        <apex:inputCheckbox id="chkboxStroller" value="{!IsAddItem[13]}"></apex:inputCheckbox> 
+        </apex:outputPanel>
+        <apex:selectList id="ddlStroller" multiselect="false"  size="1"  value="{!StrollerItemId}" styleClass="selectItems"><apex:selectOptions value="{!StrollerItems}"> </apex:selectOptions></apex:selectList>
+       <!--   <apex:inputText id="txtStrollerItemComment" value="{!StrollerItemComment}" onkeypress=" noenter(event);"/> -->
+        <apex:outputLabel value=""/>
+        
+        <apex:outputPanel >
+        <apex:outputLabel value="Super Saucer"/> 
+        <apex:inputCheckbox id="chkboxSupersoucer" value="{!objSupersoucer.IsSelectedItem}"></apex:inputCheckbox> 
+        </apex:outputPanel>
+        <apex:outputLabel value=""/> 
+        <apex:outputLabel value=""/>
+        
+        <apex:outputPanel >
+        <apex:outputLabel value="Booster Seat-Table"/> 
+        <apex:inputCheckbox id="chkboxBoosterSeat" value="{!objBoosterSeat.IsSelectedItem}"></apex:inputCheckbox> 
+        </apex:outputPanel>
+        <apex:outputLabel value=""/> 
+        <apex:outputLabel value=""/>
+        
+        <apex:outputPanel >
+        <apex:outputLabel value="Pack n Play"/> 
+        <apex:inputCheckbox id="chkboxPacknPlay" value="{!objPacknPlay.IsSelectedItem}"></apex:inputCheckbox> 
+        </apex:outputPanel>
+        <apex:outputLabel value=""/> 
+        <apex:outputLabel value=""/>
+        
+        <apex:outputPanel >
+        <apex:outputLabel value="Bouncy Seat"/> 
+        <apex:inputCheckbox id="chkboxBouncy" value="{!objBouncy.IsSelectedItem}"></apex:inputCheckbox> 
+        </apex:outputPanel>
+        <apex:outputLabel value=""/> 
+        <apex:outputLabel value=""/>
+        
+        <apex:outputPanel >
+        <apex:outputLabel value="High Chair"/> 
+        <apex:inputCheckbox id="chkboxHighChair" value="{!objHighChair.IsSelectedItem}"></apex:inputCheckbox> 
+        </apex:outputPanel>
+        <apex:outputLabel value=""/> 
+        <apex:outputLabel value=""/>
+        
+        <apex:outputPanel >
+        <apex:outputLabel value="Bassinet"/> 
+        <apex:inputCheckbox id="chkboxBassinet" value="{!objBassinet.IsSelectedItem}"></apex:inputCheckbox> 
+        </apex:outputPanel>
+        <apex:outputLabel value=""/> 
+        <apex:outputLabel value=""/>
+        
+        <apex:outputPanel >
+        <apex:outputLabel value="Indoor Swing"/> 
+        <apex:inputCheckbox id="chkboxIndoorSwing" value="{!objIndoorSwing.IsSelectedItem}"></apex:inputCheckbox> 
+        </apex:outputPanel>
+        <apex:outputLabel value=""/> 
+        <apex:outputLabel value=""/>
+        
+        <apex:outputPanel >
+        <apex:outputLabel value="Safety Gate"/> 
+        <apex:inputCheckbox id="chkboxafteyGate" value="{!objSafteyGate.IsSelectedItem}"></apex:inputCheckbox> 
+        </apex:outputPanel>
+        <apex:outputLabel value=""/> 
+        <apex:outputLabel value=""/>
+        
+        <apex:outputPanel >
+        <apex:outputLabel value="Bed Rails"/> 
+        <apex:inputCheckbox id="chkboxBedRails" value="{!objBedRails.IsSelectedItem}"></apex:inputCheckbox> 
+        </apex:outputPanel>
+        <apex:outputLabel value=""/> 
+        <apex:outputLabel value=""/>
+         
+
+                
+            <apex:outputPanel >
+            <apex:outputLabel value="Temp Available Items"/> 
+            <apex:inputCheckbox id="chkboxTemp" value="{!IsAddItem[14]}"></apex:inputCheckbox> 
+            </apex:outputPanel>
+            <apex:selectList id="ddlTemp" multiselect="false"  size="1"  value="{!TempItemId}" styleClass="selectItems"><apex:selectOptions value="{!TempItems}"> </apex:selectOptions></apex:selectList>
+           <!--   <apex:inputText id="txtTempItemComment" value="{!TempItemComment}" onkeypress=" noenter(event);"/>-->
+       
+        
+        
+      <apex:actionStatus id="ProcessingStatus">
+        <apex:facet name="start" >
+            <apex:outputPanel >
+                <center>     
+                <apex:image id="imgProcessing" value="{!URLFOR($Resource.jquery,'/jquery/Style/images/LoadingImage.gif')}"   style="top:40% ;position: absolute; width:100px; height:100px;margin-left: 10%;margin-top: 10%; "/> 
+                 </center>
+            </apex:outputPanel>
+        </apex:facet> 
+      </apex:actionStatus>   
+        
+     </apex:panelGrid>
+    <apex:pageBlockSection title="NURSERY ITEMS" collapsible="false" /> 
+        <apex:dataTable id="tblNurseryItems" value="{!WrapperNurseryItems}" var="NurseryItem" columns="3"  cellpadding="1" cellspacing="10"    width="100%"   style="text-align: center;margin-left: -5%;"  >
+           <apex:column >
+            <apex:outputPanel >
+                <apex:outputLabel value="Nursery"/>  
+                <apex:inputCheckbox id="chkboxNursery" value="{!NurseryItem.IsSelectedItem}"/> 
+                 
+            </apex:outputPanel> 
+            </apex:column>
+             <apex:column ><apex:selectList id="ddlNursery" multiselect="false"  size="1"  value="{!NurseryItem.SelectedItemId}" styleClass="selectItems" onchange="NurseryItemsComments();"><apex:selectOptions value="{!NurseryItems}"> </apex:selectOptions></apex:selectList> 
+            </apex:column>
+               <!--  <apex:column ><apex:inputText id="txtNurseryItemComment" value="{!NurseryItem.Comment}" onkeypress=" noenter(event);"/>-->
+              <apex:column ><apex:outputLabel value=""/> 
+            </apex:column>
+            
+            
+        </apex:dataTable>               
+        
+                   <apex:outputLabel /> 
+        <apex:commandButton id="btnAddMore" value="Add More"  action="{!AddNurseryRow}"  reRender="tblNurseryItems" oncomplete=" NurseryItemsComments(); "  style="margin-left: 16%;" status="ProcessingStatus" />
+          
+               
+                   
+                   
+  
+                   
+                   
+    <apex:pageBlockButtons location="bottom">
+   </apex:pageBlockButtons> 
+    <center>
+    <div id="divbuttons" >
+        <apex:commandButton id="btnBack" value="Back" action="{!Step3Back}"/>
+        <apex:commandButton id="btnSave" value="Save & Next" action="{!saveNextStep3}" onclick="return  validate();"/> 
+    </div>
+    </center>
+    </apex:pageBlock>
+         
+        </div> 
+            
+   
+     </div>
+<!-----------------------------  MiddleEnd -------------------------------->
+<!-----------------------------  FotterStart -------------------------------->
+    <div id="fotter">
+    
+    </div>
+<!-----------------------------  FotterEnd -------------------------------->
+</div>
+<!--------->
+<div id="dialog-message" title="Error Message" Style="display:none;color: #FF0000;width:auto;">
+    <p><span class="ui-icon ui-icon-circle-check" style="float: left; margin: 0 7px 50px 0;"></span>
+    <div id="divErrorMessage"></div>
+    </p> 
+</div>      
+ 
+      
+ </apex:form>
+</apex:page>

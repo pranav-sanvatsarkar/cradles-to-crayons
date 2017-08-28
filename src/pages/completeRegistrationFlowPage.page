@@ -1,0 +1,10 @@
+<apex:page standardController="Volunteer_Registration__c" tabStyle="Volunteer_Registration__c" recordSetVar="volunteerregistrations">
+    <apex:repeat value="{!Selected}" var="SelectedRow" rendered="false">
+        {!SelectedRow.Volunteer_Visit__c}{!SelectedRow.Status__c}
+    </apex:repeat>
+    <apex:variable var="VisitId" value="{!Selected[0].Volunteer_Visit__c}"/>
+    <flow:interview name="completeSelectedRegistrations" finishLocation="/{!VisitId}">
+        <apex:param name="allRegistrationRecords" value="{!Selected}"/>
+        <apex:param name="volunteerVisitId" value="{!VisitId}"/>
+    </flow:interview>
+</apex:page>

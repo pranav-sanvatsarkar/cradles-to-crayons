@@ -1,0 +1,16 @@
+<apex:page controller="ScreenStepsLiveRemoteLoginController">
+  <h1>Redirecting to ScreenSteps...</h1>
+
+  <script>   
+    var theSSLiveURL = 'https://cradlestocrayons.screenstepslive.com/login/remote/358';
+    var theOrganization = encodeURIComponent('');
+
+    theSSLiveURL += '?first_name=' + encodeURIComponent('{!$User.FirstName}');
+    theSSLiveURL += '&last_name=' + encodeURIComponent('{!$User.LastName}')  + '&email=' + encodeURIComponent('{!$User.Email}');
+    theSSLiveURL += '&external_id=' + encodeURIComponent('{!$User.Id}')  + '&organization=' + theOrganization;
+    theSSLiveURL += '&timestamp={!$CurrentPage.parameters.timestamp}' + '&hash={!md5String}';
+    theSSLiveURL += '&return_to_url=' + encodeURIComponent('{!$CurrentPage.parameters.return_to_url}');
+
+    window.location = theSSLiveURL;
+  </script>
+</apex:page>

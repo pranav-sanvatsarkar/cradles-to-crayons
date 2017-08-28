@@ -1,0 +1,73 @@
+<apex:component controller="CommunityDashboardController">
+     					<style>
+     						.custom-row{
+     							padding:15px 0px
+     						}
+     						.profileheader{
+	     							margin: 15px;margin-left: -25px;
+     						}
+     						@media(max-width:460px){
+     							.profileheader{
+	     							margin-left: -25px;
+	    							margin-top: 15px;
+     							}
+     							h3{
+     								font-size: 19px;
+     							}
+     						}
+     					</style>
+     					<div class="panel panel-default">
+						<div class="panel-heading"><span aria-hidden="true" class="fa fa-user"> </span> User Details</div>
+						<div class="panel-body" style="padding:30px">
+     					<div class="row">
+		              		<div class="col-md-3">
+		              			<div class="col-md-12">
+	     							<apex:image url="{!userDetails.FullPhotoUrl}" style="width:100%;"></apex:image>
+	     						</div>
+	     						<div class="col-md-12">
+	     							<h3 style="text-align:center">
+	     							<apex:outputText value=" {0}  {1} ">
+				               			<apex:param value="{!userDetails.Contact.FirstName}"/>
+		       							<apex:param value="{!userDetails.Contact.LastName}"/>
+	    							</apex:outputText>
+	    							</h3>
+	     						</div>
+		              		</div>
+		              		<div class="col-md-9">
+		              			<div class="row col-md-6 col-sm-6 custom-row">
+				              		<div class="col-md-12" style="padding-top:0px"><label class="label-padding">Username  </label></div>
+				              		<div class="col-md-12">&nbsp;<apex:outputText value="{!userDetails.username}"/></div>
+				              	</div>
+				              	<div class="row col-md-6 col-sm-6 custom-row">
+				              		<div class="col-md-12" style="padding-top:0px"><label class="label-padding">Email  </label></div>
+				              		<div class="col-md-12">&nbsp;<apex:outputText value="{!userDetails.Email}"/></div>
+				              	</div>
+				              	<div class="row col-md-6 col-sm-6 custom-row">
+				              		<div class="col-md-12"><label class="label-padding">Organization Name  </label></div>
+				              		<div class="col-md-12">&nbsp;<apex:outputText value="{!userDetails.Contact.Account.Name}"/></div>
+				              	</div>
+				              	<div class="row col-md-6 col-sm-6 custom-row">
+				              		<div class="col-md-12"><label class="label-padding">Preferred Phone  </label></div>
+				              		<div class="col-md-12">&nbsp;<apex:outputText value="{!userDetails.Contact.npe01__PreferredPhone__c}"/></div>
+				              	</div>
+		                       <div class="row col-md-6 col-sm-6 custom-row">
+				              		<div class="col-md-12"><label class="label-padding">Mobile Phone  </label> </div>
+				              		<div class="col-md-12">&nbsp;<apex:outputText value="{!userDetails.Contact.MobilePhone}"/></div>
+				              	</div>
+				              	<div class="row col-md-6 col-sm-6 custom-row">
+				              		<div class="col-md-12"><label class="label-padding">Work Phone  </label></div>
+				              		<div class="col-md-12">&nbsp;<apex:outputText value="{!userDetails.Contact.npe01__WorkPhone__c}"/></div>
+				              	</div>
+		                      	<div class="row col-md-6 col-sm-6 custom-row" style="padding-bottom: 30px;">
+				              		<div class="col-md-12"><label class="label-padding">Home Phone  </label></div>
+				              		<div class="col-md-12">&nbsp;<apex:outputText value="{!userDetails.Contact.HomePhone}"/></div>
+				              	</div>
+		              		</div>
+		              	</div>
+		              	<div class="row">
+		              		<div class="well" style="display: flex;">
+			              		<apex:outputText style="font-weight:600;" value="{!portalConfiguration.ProfilePageMessage__c}" />
+			              	</div>
+		              	</div>
+          </div></div>             
+</apex:component>

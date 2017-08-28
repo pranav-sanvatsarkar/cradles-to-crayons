@@ -1,0 +1,41 @@
+<apex:component >  
+	<apex:attribute name="orderLevel" description="Order level" type="String"/>
+   	<apex:attribute name="newOrder" description="It disable or enable the link" type="String"/>
+    <apex:attribute name="userMessage" description="It displays messages" type="String"/>
+    <apex:attribute name="SideBarHeight" description="side bar height" type="String" required="false"/>
+    <apex:attribute name="EnableCustomLinks" description="" type="String" required="false"/>
+    <apex:attribute name="EnableOrder" description="" type="String" required="false"/>
+    <apex:attribute name="EnableBulkOrder" description="" type="String" required="false"/>
+    <div id="divSidebarmain">
+	<!--<div style="height:{!SideBarHeight}" >-->
+	<div style="height:100%;"   >
+		<div id="divOrderLevel">
+			Order Level: {!orderLevel}  
+		</div>
+	<apex:panelGrid columns="1"  cellpadding="0">  
+	</apex:panelGrid>
+	<div style="display:{!EnableCustomLinks}">
+		<div id="divcustomSideBarLinkHeader" style="background-color:#a97ef7;">
+			Place a Request: 
+		</div> 
+	<div id="divcustomSideBarLinkText" >
+	<div>
+</div>
+<apex:panelGrid columns="1"  cellpadding="0">
+    <apex:outputLink id="lblNewOrder" value="{!$Site.CurrentSiteUrl}PartnerOrderStep1" style="text-decoration:none;display:{!EnableOrder}"  >KidPack</apex:outputLink>
+	<apex:outputLink id="lblNewBulkOrder" value="{!$Site.CurrentSiteUrl}PartnerBulkOrder" style="text-decoration:none;display:{!EnableBulkOrder}" >Specialty Items</apex:outputLink>      
+</apex:panelGrid>
+ </div>
+</div>
+<div style="height:20px;display:{!EnableCustomLinks}"></div>
+	<div id="divcustomSideBarMessageHeader">
+		Messages and Alerts 
+	</div>
+	<div id="divcustomSideBarMessageText">
+		<div id="divOuterMessageBox"  > 
+			<apex:outputLabel id="lblMessage" escape="false" value="{!userMessage}"/>
+        </div> 
+	</div>  
+ </div> 
+</div>
+</apex:component>

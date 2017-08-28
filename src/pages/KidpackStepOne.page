@@ -1,0 +1,210 @@
+<apex:page controller="KidpackController" sidebar="false" standardStyleSheets="false" showHeader="false" action="{!redirectToLogin}">
+<meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <c:GlobalResources local="{!$CurrentPage.parameters.local}" Application_JS="common-controls.js,salesforce.js,error-manager.js,community-dashboard.js,application.js" Vendor_JS="datatables/jquery.dataTables.min.js,datatables/dataTables.responsive.js" Vendor_CSS="font-awesome/css/font-awesome.min.css,bootstrap/css/bootstrap.min.css,datatables/jquery.dataTables.css,datatables/responsive.dataTables.css,jquery/jquery-ui-custom.css" Application_CSS="application.css"/>
+	<head>
+    	<title>Kidpack</title>
+        <style >
+        	.messageCell{
+            	width: 100%;
+            }
+                .messageCell h4{
+                    display:none;
+                }
+            	.messageText{
+            		color: red;
+            		padding-bottom: 5px;
+            	}
+        </style>
+    	<script type="text/javascript">
+		       function toggleSideBar(){
+					if($(".app-sidebar").css('display') != 'none'){
+						$("#menuBttn").css("margin-left", "8px");
+						$(".app-sidebar").css("display", "none");
+					}
+					else{
+						$("#menuBttn").css("margin-left", "182px");
+						$(".app-sidebar").css({"position": "fixed", "top": 0, "bottom": 0, "display":"inline-block"});
+					}
+				}
+				function closeSideBar(){
+					$("#menuBttn").css("margin-left", "8px");
+					$(".app-sidebar").css("display", "none");
+				}
+				//Validation of input fields
+				$(document).ready(function(){ 
+					$(".parent-helper").parents("table").addClass("table");
+				});
+				function Errorpopup(msg){ 
+				        $("#dialog-message").text(msg);
+				        $("#dialog-message").dialog({
+			                 width:320,
+			                 modal: true,
+			                 draggable:false,
+			                 resizable:false,
+			                 buttons: {
+						                 Ok: function() {
+						                 		$(this).dialog("close");
+						                 }
+              				 },
+              				 open:function(event, ui){
+              				 	$('.ui-dialog-titlebar-close').hide();
+              				 	var btn = $('.ui-dialog-buttonpane').find('button')
+              				 	btn.addClass('btn btn-default');
+              				 	btn.css({'font-size':'12px'});
+              				 	
+              				 }
+				          });
+				        return false;
+			    }
+				function validate(){ 
+                    console.log('In validate==>');
+					$('.errText').remove();
+                    var validationFlag = true;
+				    if($('input[id$=txtChildFirstName]').val() == ''){
+                           InlineErrorMessege('Please enter Child First Name.','input[id$=txtChildFirstName]');
+				           validationFlag = false;
+				    }
+				    if($('input[id$=txtChildLastName]').val() == ''){
+				           InlineErrorMessege('Please enter Child Last Name.','input[id$=txtChildLastName]');
+				           validationFlag = false;
+					}
+    				if($('select[id$=ddlChildAge]').val() == ''){
+           				InlineErrorMessege('Please select Child Age.','select[id$=ddlChildAge]');
+           				validationFlag = false;
+       				}
+       	 			if($('select[id$=ddlChildGender]').val() == '') {
+           				InlineErrorMessege('Please select Child Gender.','select[id$=ddlChildGender]');
+           				validationFlag = false;
+       				}
+           			if($('input[id$=txtZipCode]').val() == ''){
+            			 InlineErrorMessege('Please enter Home Zip code.','input[id$=txtZipCode]');
+           				 validationFlag = false;
+                	}
+           
+        			if($('input[id$=txtZipCode]').val().length == 5 || $('input[id$=txtZipCode]').val().length == 10){
+           				var patt1 = new RegExp('^\\d{5}-\\d{4}$');
+           				var patt2=new RegExp('^\\d{5}$');
+           				if(patt1.test($('input[id$=txtZipCode]').val()) || patt2.test($('input[id$=txtZipCode]').val())){
+            			}
+            			else{
+                  			InlineErrorMessege('Please enter correct Home Zip Code.','input[id$=txtZipCode]');
+                  			validationFlag = false;
+                		}
+       				 }
+                     if(!validationFlag){
+                        $($('.errText')[0]).prev().focus();
+                     }
+       				 return validationFlag;
+    			}
+				    
+    	</script>
+    </head>
+    <body ng-app="dashboardApp" style="height:100%" ng-controller="dashboardCtrl">
+    	<div id="spinnerContainer"></div>
+    	<apex:form >
+	    	<div class="main-container">   
+                 	<c:TopHeader userName="{!userDetails.Name}"></c:TopHeader>
+                <apex:outputPanel id="sidebar" layout="block">
+					<c:SidebarComponent ></c:SidebarComponent>
+                </apex:outputPanel>
+				<apex:actionStatus id="ProcessingStatus" startStyleClass="imageloading" onstop="tablecss();initTooltip();">
+                       <apex:facet name="start">
+                           <apex:outputPanel >
+                               <center>
+                                   <apex:image value="{!URLFOR($Resource.jquery,'/jquery/Style/images/LoadingImage.gif')}" style="top:calc(50% - 75px) ;left: calc(50% - 75px);position: absolute; width:150px; height:150px; "/>
+                               </center>
+                           </apex:outputPanel>
+                       </apex:facet>
+             </apex:actionStatus>
+				<div class="container" id="applicationContainer"  style="padding-top:30px;padding-bottom:30px">
+					<!-- Progress tracker starts here -->
+					<div class="row">
+						<ol class="progress-tracker col-md-12 col-sm-12 col-xs-12">
+							  <li class="step col-md-2  col-sm-2 col-xs-2 col-md-offset-1 active" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+							  <li class="step col-md-2 col-sm-2 col-xs-2" style="padding-left:0;padding-right:0"><span class="step-name"></span></li>
+						</ol>
+					</div>
+                    <div>
+                        <apex:pageMessages id="errorMessage" ></apex:pageMessages>
+                    </div>
+					<div class="panel panel-default">
+							<div class="panel-heading">
+								<span aria-hidden="true" class="fa fa-child"> </span> Kidpack - Child Info 
+								<span rel="tooltip" title="Please provide the following information about the child you wish to serve. " class="fa fa-question-circle"></span>
+							</div>
+							<div class="panel-body">
+						 		<div class="row custom-row">
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<span class="assistiveText">*</span><apex:outputLabel value="Child's First Name"/>
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputField label="" styleClass="form-control" id="txtChildFirstName" value="{!partnerOrder.Child_First_Name__c}" required="true" />
+	                                </div>
+									<div class="clearfix visible-sm-block"></div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<span class="assistiveText">*</span><apex:outputLabel value="Child's Last Name"/> <span rel="tooltip" class="fa fa-question-circle" title="{!$ObjectType.Partner_Order__c.fields.Child_Last_Name__c.inlineHelpText}"></span>
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputField label="" styleClass="form-control" id="txtChildLastName" value="{!partnerOrder.Child_Last_Name__c}" required="true" />
+									</div>
+									</div>
+						 		<div class="row custom-row">
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<span class="assistiveText">*</span><apex:outputLabel value="Age"/>
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputField label="" styleClass="form-control" id="ddlChildAge" value="{!partnerOrder.Child_Age__c}" required="true" />
+	                                </div>
+									<div class="clearfix visible-sm-block"></div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<span class="assistiveText">*</span><apex:outputLabel value="Gender"/> 
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputField label="" styleClass="form-control" id="ddlChildGender" value="{!partnerOrder.Child_Gender__c}" required="true" />
+									</div>
+								</div>
+								<div class="row custom-row">
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<span class="assistiveText">*</span><apex:outputLabel value="Child's Home Zip Code"/>
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputField label=""   html-maxlength="5" styleClass="form-control" id="txtZipCode" value="{!partnerOrder.Child_Home_Zip_Code__c}" required="true" />
+	                                </div>
+									<div class="clearfix visible-sm-block"></div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+									</div>
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+									</div>
+								</div>
+								<div class="row custom-row">
+									<div class="col-md-3 col-sm-6 col-xs-12 top-padding">
+										<apex:outputLabel value="Child's Story:"/> <span class="fa fa-question-circle" rel="tooltip" title="{!$ObjectType.Partner_Order__c.fields.Child_s_Story__c.inlineHelpText}"></span>
+									</div>
+									<div class="col-md-8 col-sm-6 col-xs-12 top-padding">
+	                                	<apex:inputField label=""  style="resize: vertical;height:auto!important" id="txtChildStory" value="{!partnerOrder.Child_s_Story__c}"  />
+	                                </div>
+								</div>
+							</div>
+					</div>
+					<apex:actionFunction action="{!saveStepOne}" name="saveNext"> </apex:actionFunction>
+					 <div class="row">
+					 	<div class="col-md-6 col-sm-6 col-xs-12" style="margin-bottom:5px">
+					 		<input type="button" id="btnCancel" Class="btn btn-default btn-block" value="Cancel" onclick="getCancelSpeciality();"/>
+					 	</div>
+					 	<div class="col-md-6 col-sm-6 col-xs-12" style="margin-bottom:5px">
+					 		 <apex:commandButton id="btnSave" value="Save & Next" styleClass="btn btn-default btn-block" onclick="if(validate()){saveNext();}return false;" status="ProcessingStatus" />  
+					 	</div>
+					 </div>
+			 	</div>
+			 	<div id="dialog-message" style="overflow: hidden;z-index: 999999;">
+           		</div>
+                
+			 </div>
+			 
+		</apex:form>
+    </body>
+</apex:page>
